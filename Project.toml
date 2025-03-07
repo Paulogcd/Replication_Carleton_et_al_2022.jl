@@ -3,7 +3,11 @@ uuid = "ce007ffe-0ac4-49be-aaf6-7fee32452875"
 authors = ["Paulo Gugelmo Cavalheiro Dias gugelmopaulo@gmail.com and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
 [compat]
+Documenter = "1.8.1"
 julia = "1.6.7"
 
 [extras]
