@@ -1,0 +1,13 @@
+name = "Replication_Carleton_et_al_2022"
+uuid = "ce007ffe-0ac4-49be-aaf6-7fee32452875"
+authors = ["Paulo Gugelmo Cavalheiro Dias gugelmopaulo@gmail.com and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.6.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
