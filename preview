@@ -1,0 +1,2 @@
+julia --project docs/make.jl
+julia -e 'using Pkg; Pkg.activate(".");using LiveServer; serve(dir="docs/build")'
