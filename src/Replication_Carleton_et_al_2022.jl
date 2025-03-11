@@ -1,5 +1,6 @@
 module Replication_Carleton_et_al_2022
 
+include("1_table_1.jl")
 # Write your package code here.
 
 """
