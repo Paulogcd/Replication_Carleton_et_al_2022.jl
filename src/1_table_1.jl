@@ -1,15 +1,33 @@
 
 # This file is dedicated to reproducing the first table of descriptive statistics of the article.
+# It is the equivalent of the "/carleton_mortality_2022/1_estimation/estimate.do" file of the original replication package.
+# Each step is carefully commented. The original STATA code is always preceeded by three "#" symbols: ###.
 
-# Dependencies : 
-# using Pkg 
+# Loading the required packages in Julia: 
+using Pkg 
 using ReadStatTables
 using DataFrames
 using Statistics
 using StatsBase
 using Latexify
+using Base.GC
 
-### STATA code: 
+
+# First of all, the authors load the data:
+### STATA:
+### do "$REPO/carleton_mortality_2022/0_data_cleaning/1_utils/set_paths.do"
+
+df = DataFrame(ReadStatTables.readstat("input/final_data/global_mortality_panel_public.dta"))
+
+# varinfo()
+#  df   2.201 GiB 639476×639 DataFrame
+# GC.gc()
+# varinfo()
+
+# Then, they briefly excluded data from before 2010, and winsorize the rest. 
+# They exclude the extrema of death rate, by remplacing it by the 99th percentile. 
+
+### STATA:
 ### 	* 0. generate deathrate
 ###	keep if year <= 2010
 ###        * create winsorized deathrate with-in country-agegroup
@@ -18,60 +36,27 @@ using Latexify
 ###        replace deathrate_w99 = deathrate_p99 if deathrate > deathrate_p99 & !mi(deathrate)
 ###        drop deathrate_p99
 
-df = DataFrame(readstat("input/final_data/global_mortality_panel_public.dta")) # We load the file
-GC.gc()
-1+1 # Adding modifications to test changes.
-
-# df = global_mortality_panel_public # [:year] # former version: copy 
-df[df.year .<= 2010, :] # We take out the data from before 2010
-# GC.gc()
-### bysort iso agegroup: egen deathrate_p99 = pctile(deathrate), p(99)
-
-grouped_df = groupby(df, [:iso, :agegroup]) # We group by the variables iso and agegroup
-
-# df[!,:year]
-# "deathrate" ∈ names(grouped_df)
-
-deathrate_column = combine(grouped_df, :deathrate => (x -> x) => :deathrate) # We construct the deathrate variable
-
-# grouped_df
-
-clean_df = dropmissing(deathrate_column)  # Drops rows with `missing` or `NaN`
-# GC.gc()
-# view(deathrate_column,:,3)
-
-# StatsBase.percentile(clean_df[:,3], 99)
-# Then, we create the deathrate_p99 variable, by using the quantile function, we ignore the NaNs and missing values:
-# df.deathrate_p99 = transform(grouped_df, :deathrate => (x -> quantile(filter(!isnan, collect(skipmissing(x)))),99) => :deathrate_p99)
-
-# df[:,:agegroup]
-
-# Step 1: Keep rows where `year` is less than or equal to 2010
-df = df[df.year .<= 2010, :]
-GC.gc()
-# Step 2: Calculate the 99th percentile of `deathrate` for each `iso` and `agegroup`
-# Group the DataFrame by `iso` and `agegroup`
-grouped_df = groupby(df, [:iso, :agegroup])
-
-# Define a function to calculate the 99th percentile
+df = df[df.year .<= 2010, :]                                                        # We take out the data from before 2010
+grouped_df = groupby(df, [:iso, :agegroup])                                         # We group by the variables iso and agegroup
+# Define a function to calculate the 99th percentile: 
 function calculate_p99(x)
     return quantile(skipmissing(x), 0.99)
 end
+# We construct the temporary deathrate_p99 variable with this function: 
+df.deathrate_p99 = transform(grouped_df, :deathrate => calculate_p99 => :deathrate_p99).deathrate_p99   
+df.deathrate_w99 = df.deathrate     # Step 3: Create a new column `deathrate_w99` that is a copy of `deathrate`
+df.deathrate_w99 = [coalesce(dr, dr_p99) > dr_p99 ? dr_p99 : coalesce(dr, dr_p99) for (dr, dr_p99) in zip(df.deathrate, df.deathrate_p99)] # We replace the values in `deathrate_w99` with the 99th percentile if `deathrate` > `deathrate_p99` and not missing
+select!(df, Not(:deathrate_p99)) # We drop the temporary column `deathrate_p99`
 
-# Apply the function to each group and store the result in a new column `deathrate_p99`
-df.deathrate_p99 = transform(grouped_df, :deathrate => calculate_p99 => :deathrate_p99).deathrate_p99
+# Cleaning environment to free memory
+# varinfo()
+grouped_df = nothing 
 GC.gc()
-# Step 3: Create a new column `deathrate_w99` that is a copy of `deathrate`
-df.deathrate_w99 = df.deathrate
+# varinfo()
 
-# Step 4: Replace values in `deathrate_w99` with the 99th percentile if `deathrate` > `deathrate_p99` and not missing
-df.deathrate_w99 = [coalesce(dr, dr_p99) > dr_p99 ? dr_p99 : coalesce(dr, dr_p99) for (dr, dr_p99) in zip(df.deathrate, df.deathrate_p99)]
+# Then, the authors clean further the data by eliminating missing values, and only keeping data from at most 2010.
 
-# Step 5: Drop the temporary column `deathrate_p99`
-select!(df, Not(:deathrate_p99))
-
-# df
-
+### STATA:
 ### * 0. keep the sample
 ### gen sample = 0
 ### replace sample = 1 if year < = 2010
@@ -86,22 +71,17 @@ select!(df, Not(:deathrate_p99))
 # Here, staying close to the syntax of the STATA code, we could write : 
 
 df.sample = zeros(size(df)[1])
-
 df.sample[df.year .<= 2010] .= 1
-# df.sample[df.year .<= 2010] .= 0
-
 df.sample[ismissing.(df[!,:deathrate_w99])] .= 0
 df.sample[ismissing.(df[!,:tavg_poly_1_GMFD])] .= 0
 df.sample[ismissing.(df[!,:prcp_poly_1_GMFD])] .= 0
 df.sample[ismissing.(df[!,:loggdppc_adm1_avg])] .= 0
 df.sample[ismissing.(df[!,:lr_tavg_GMFD_adm1_avg])] .= 0
-
-# findmax(df.sample)
-# sum(df.sample)
 df = df[df.sample .== 1, :]
 
-# Then, the authors hard write the populations: 
+# Then, the authors hard-write the populations: 
 
+### STATA:
 ### * 1. generate global population share 
 ### * generate global pop share in 2010
 ### gen pop_global_2010 = 6.933 * 1000000000
@@ -132,15 +112,21 @@ df.pop_adm0_2010[df.iso .== "MEX",:] .= 117319
 df.pop_adm0_2010[df.iso .== "USA",:] .= 309348
 df.pop_adm0_2010 .= df.pop_adm0_2010 * 1000
 
+# Also, they create the population share for each country: 
+
+### STATA:
 ### * generate pop share for each country
 ### 	gen popshare_global = pop_adm0_2010 /  pop_global_2010
 ### 	order popshare_global pop_adm0_2010 pop_global_2010, a(population)
 
 df.popshare_global = df.pop_adm0_2010 ./ pop_global_2010
+# The last line just reorder the columns in the dataframe, putting the mentioned variables after the column "population".
 
-# The last line just reorder the columns in the dataframe.'
+# Then, the authors generate a variable capturing the number of days above 28 degrees celsius.
+# It is constructed by adding the number of days with temperature from 29 to 34 degrees. 
+# The STATA syntax "28(1)34" corresponds to the Julia syntax "28:1:34".
 
-
+### STATA:
 ### 2. generate number of days > 28 degree C [GMFD]
 ### gen NumOfDays_above28 = 0
 ### forvalues i = 28(1)34 {
@@ -157,12 +143,15 @@ for i in 28:1:34
     tmp2 = string("C_",j)
     tmp3 = string(tmp2,"C_GMFD")
     tmp4 = string(tmp1,tmp3)
-    println(tmp4,"\n")
+    # println(tmp4,"\n")
     df.NumOfDays_above28 .= df.NumOfDays_above28 .+ df[!,tmp4]
 end
 
 df.NumOfDays_above28 = df.NumOfDays_above28 .+ df.tavg_bins_35C_Inf_GMFD
 
+# The authors then create the ww variable, which corresponds to the population in some cases. 
+
+### STATA:
 ### gen ww = population if year == 2010 & iso != "IND"
 ### 	replace ww = population if year == 1995 & iso == "IND"
 ### 	bysort iso adm1_id adm2_id agegroup: egen weight = max(ww)		
@@ -170,8 +159,11 @@ df.NumOfDays_above28 = df.NumOfDays_above28 .+ df.tavg_bins_35C_Inf_GMFD
 df.ww = zeros(size(df)[1])
 df.ww[ (df.year .== 2010) .& (df.iso .!= "IND") ] = df.population[ (df.year .== 2010) .& (df.iso .!= "IND") ]
 
-# foreach(println, names(df))
 
+# The authors then use a loop statement that performs both computations and print the results to the terminal.
+# Here, we decide to divide the code of the loop in several code sections. 
+
+### STATA:
 ### foreach iso in "BRA" "CHL" "CHN" "EU" "FRA" "JPN" "MEX" "USA" "IND" "Global" {
 ### 
 ### 	* 1. keep the country
@@ -189,7 +181,7 @@ df.ww[ (df.year .== 2010) .& (df.iso .!= "IND") ] = df.population[ (df.year .== 
 ### 			     if iso == "`iso'"
 ### 	}
 
-# Here, we exclude China and USA: 
+# Here, we exclude China and USA, since we do not have their data.
 countries_vector = ["BRA",
                     "CHL",
                     # "CHN",
@@ -201,8 +193,7 @@ countries_vector = ["BRA",
                     "IND",
                     "Global"]
 
-# filtered_df = Array{DataFrame}(undef,length(countries_vector))
-
+# We then define a function to transform a dataframe in a filtered one:
 function filter_df(df::DataFrame,countries_vector::Array)::Array{DataFrame}
 
     filtered_df = Array{DataFrame}(undef,length(countries_vector))
@@ -224,7 +215,7 @@ function filter_df(df::DataFrame,countries_vector::Array)::Array{DataFrame}
         end
 
         # println(keepthiscountry)
-        println(country)
+        # println(country)
 
         filtered_df[index_country] = df[df.keepthiscountry .== 1, :]
 
@@ -234,16 +225,21 @@ function filter_df(df::DataFrame,countries_vector::Array)::Array{DataFrame}
 end
 
 filtered_df = filter_df(df,countries_vector)
-GC.gc()
-# filtered_df
 
-    ### 	if "`iso'" != "IND" & "`iso'" != "Global" {
-	###	sum year if agegroup != 0
-    ###        local N 					= `r(N)'
-    ###        * year
-    ###        local year_start 			= `r(min)'
-    ###        local year_end	 			= `r(max)'
-    ###    }
+# Cleaning environment to free memory
+# varinfo()
+df = nothing 
+GC.gc()
+# varinfo()
+
+### STATA:
+### 	if "`iso'" != "IND" & "`iso'" != "Global" {
+###	sum year if agegroup != 0
+###        local N 					= `r(N)'
+###        * year
+###        local year_start 			= `r(min)'
+###        local year_end	 			= `r(max)'
+###    }
 
 function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
 
@@ -261,7 +257,7 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
 
         df_under_work = filtered_df[index_country]
 
-        # println(index_country," ", country)
+        # println(index_country," ", country) # for debugging reasons.
 
         if country != "IND" && country != "Global"
             N = nrow(df_under_work[df_under_work.agegroup .!= 0, :])
@@ -318,6 +314,7 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
         # Population share
         popshare = round(mean(df_under_work.popshare_global), digits=3)
 
+        # For now, we do not use this: 
         # Income, temperature, and days above 28°C
         # income = round(mean(df_under_work.gdppc_adm1_avg[df_under_work.agegroup .== 0]), digits=1)
         # tmean = round(mean(df_under_work.lr_tavg_GMFD_adm1_avg[df_under_work.agegroup .== 0]), digits=1)
@@ -338,6 +335,8 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
             global_df = unique(global_df)
             popshare = round(sum(global_df.popshare_global), digits=3)
         end
+        
+        # We push those values in the dedicated arrays. 
         push!(table_countries,country)
         push!(table_population_size,N)
         push!(table_spatial_scale,spatial_resolution)
@@ -358,7 +357,7 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
     # println("$country & $N & $spatial_resolution & $year_start-$year_end & $AgeCat & $deathrate_allage & $deathrate_65plus & $popshare & $income & $tmean & $daysabove28 \\")
     end
     # Returning the results: 
-    results = DataFrame(;table_countries, # This syntax is amazing, I love the use of ";" to make a named object.
+    results = DataFrame(;table_countries, # This syntax is very practical, I appreciate the use of ";" to make a named object.
                         table_population_size,
                         table_spatial_scale,
                         table_years, 
@@ -372,6 +371,17 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
 end
 
 results = statistics_df(filtered_df,countries_vector)
+
+# Cleaning environment to free memory
+# varinfo()
+filtered_df = nothing
 GC.gc()
+# varinfo()
+
+# Finally, we print the result here: 
 data_table_1 = latexify(results; env=:table, booktabs=true, latex=false)
+
+# varinfo()
+
+# varinfo()
 GC.gc()

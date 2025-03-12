@@ -7,7 +7,7 @@ module Replication_Carleton_et_al_2022
     The function `test` is a test to check that the Replication_Carleton_et_al_2022 module is well loaded.
     """
     function test()
-        print("Hello world! The Replication_Carleton_et_al_2022 package is well loaded.")
+        print("Hello world! The Replication_Carleton_et_al_2022.jl package is well loaded.")
     end
 
     export test
