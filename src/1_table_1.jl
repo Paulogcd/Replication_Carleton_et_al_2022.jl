@@ -18,11 +18,13 @@ using Latexify
 ###        replace deathrate_w99 = deathrate_p99 if deathrate > deathrate_p99 & !mi(deathrate)
 ###        drop deathrate_p99
 
-global_mortality_panel_public = DataFrame(readstat("input/final_data/global_mortality_panel_public.dta")) # We load the file
+df = DataFrame(readstat("input/final_data/global_mortality_panel_public.dta")) # We load the file
+GC.gc()
+1+1 # Adding modifications to test changes.
 
-df = copy(global_mortality_panel_public) # [:year]
+# df = global_mortality_panel_public # [:year] # former version: copy 
 df[df.year .<= 2010, :] # We take out the data from before 2010
-
+# GC.gc()
 ### bysort iso agegroup: egen deathrate_p99 = pctile(deathrate), p(99)
 
 grouped_df = groupby(df, [:iso, :agegroup]) # We group by the variables iso and agegroup
@@ -35,10 +37,10 @@ deathrate_column = combine(grouped_df, :deathrate => (x -> x) => :deathrate) # W
 # grouped_df
 
 clean_df = dropmissing(deathrate_column)  # Drops rows with `missing` or `NaN`
-
+# GC.gc()
 # view(deathrate_column,:,3)
 
-StatsBase.percentile(clean_df[:,3], 99)
+# StatsBase.percentile(clean_df[:,3], 99)
 # Then, we create the deathrate_p99 variable, by using the quantile function, we ignore the NaNs and missing values:
 # df.deathrate_p99 = transform(grouped_df, :deathrate => (x -> quantile(filter(!isnan, collect(skipmissing(x)))),99) => :deathrate_p99)
 
@@ -46,7 +48,7 @@ StatsBase.percentile(clean_df[:,3], 99)
 
 # Step 1: Keep rows where `year` is less than or equal to 2010
 df = df[df.year .<= 2010, :]
-
+GC.gc()
 # Step 2: Calculate the 99th percentile of `deathrate` for each `iso` and `agegroup`
 # Group the DataFrame by `iso` and `agegroup`
 grouped_df = groupby(df, [:iso, :agegroup])
@@ -58,7 +60,7 @@ end
 
 # Apply the function to each group and store the result in a new column `deathrate_p99`
 df.deathrate_p99 = transform(grouped_df, :deathrate => calculate_p99 => :deathrate_p99).deathrate_p99
-
+GC.gc()
 # Step 3: Create a new column `deathrate_w99` that is a copy of `deathrate`
 df.deathrate_w99 = df.deathrate
 
@@ -232,8 +234,8 @@ function filter_df(df::DataFrame,countries_vector::Array)::Array{DataFrame}
 end
 
 filtered_df = filter_df(df,countries_vector)
-
-filtered_df
+GC.gc()
+# filtered_df
 
     ### 	if "`iso'" != "IND" & "`iso'" != "Global" {
 	###	sum year if agegroup != 0
@@ -317,9 +319,9 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
         popshare = round(mean(df_under_work.popshare_global), digits=3)
 
         # Income, temperature, and days above 28°C
-        income = round(mean(df_under_work.gdppc_adm1_avg[df_under_work.agegroup .== 0]), digits=1)
-        tmean = round(mean(df_under_work.lr_tavg_GMFD_adm1_avg[df_under_work.agegroup .== 0]), digits=1)
-        daysabove28 = round(mean(df_under_work.NumOfDays_above28[df_under_work.agegroup .== 0]), digits=1)
+        # income = round(mean(df_under_work.gdppc_adm1_avg[df_under_work.agegroup .== 0]), digits=1)
+        # tmean = round(mean(df_under_work.lr_tavg_GMFD_adm1_avg[df_under_work.agegroup .== 0]), digits=1)
+        # daysabove28 = round(mean(df_under_work.NumOfDays_above28[df_under_work.agegroup .== 0]), digits=1)
 
         # Special case for Global
         if country == "Global"
@@ -370,5 +372,6 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
 end
 
 results = statistics_df(filtered_df,countries_vector)
-
+GC.gc()
 data_table_1 = latexify(results; env=:table, booktabs=true, latex=false)
+GC.gc()
