@@ -1,4 +1,5 @@
 /Manifest.toml
 .vscode/
 docs/build/
-input/
+0_input/*
+utilities/ftp_connect

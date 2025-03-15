@@ -11,13 +11,13 @@ using Statistics
 using StatsBase
 using Latexify
 using Base.GC
-
+using Weave
 
 # First of all, the authors load the data:
 ### STATA:
 ### do "$REPO/carleton_mortality_2022/0_data_cleaning/1_utils/set_paths.do"
 
-df = DataFrame(ReadStatTables.readstat("input/final_data/global_mortality_panel_public.dta"))
+df = DataFrame(ReadStatTables.readstat("0_input/final_data/global_mortality_panel_public.dta"))
 
 # varinfo()
 #  df   2.201 GiB 639476×639 DataFrame
@@ -370,7 +370,7 @@ function statistics_df(filtered_df::Array{DataFrame},countries_vector::Array)
 
 end
 
-results = statistics_df(filtered_df,countries_vector)
+results_table_1 = statistics_df(filtered_df,countries_vector)
 
 # Cleaning environment to free memory
 # varinfo()
@@ -378,10 +378,50 @@ filtered_df = nothing
 GC.gc()
 # varinfo()
 
-# Finally, we print the result here: 
-data_table_1 = latexify(results; env=:table, booktabs=true, latex=false)
-
-# varinfo()
-
-# varinfo()
 GC.gc()
+
+# Finally, the function that creates the output: 
+
+"""
+The function `create_table_1()` creates a `pdf` containing the replication result of the Figure 1.
+
+The `pdf` file is created within the `0_output` folder.
+
+"""
+function create_table_1()
+
+    # Convert DataFrame to LaTeX table
+    output = IOBuffer()
+    show(output, MIME("text/latex"), results_table_1)
+    table_latex = String(take!(output))
+
+    # Create LaTeX document
+    latex_doc = """
+    \\documentclass{article}
+    \\usepackage{geometry}
+    \\geometry{legalpaper, landscape, margin=0.05in}
+    \\begin{document}
+    $table_latex
+    \\end{document}
+    """
+
+    # Save and convert to PDF
+    write("table_1.tex", latex_doc)
+    Base.run(`pdflatex table_1.tex`)
+    # Move to 0_output folder
+    Base.run(`mv table_1.pdf 0_output/table_1.pdf`)
+    
+    # Delete artifacts
+    Base.run(`rm table_1.tex`)
+    Base.run(`rm table_1.aux`)
+    Base.run(`rm table_1.log`)
+
+    print("Table 1 created successfully!")
+end
+
+export create_table_1
+
+# create_table_1()
+
+# It is also possible to access the latex version of the dataframe directly:
+# data_table_1 = latexify(results_table_1; env=:table, booktabs=true, latex=false)
