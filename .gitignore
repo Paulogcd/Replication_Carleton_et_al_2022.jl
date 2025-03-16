@@ -1,5 +1,6 @@
 /Manifest.toml
 .vscode/
 docs/build/
-0_input/*
+0_input/final_data
 utilities/ftp_connect
+src/.DS_Store

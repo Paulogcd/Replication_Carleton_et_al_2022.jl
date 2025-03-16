@@ -10,10 +10,14 @@ module Replication_Carleton_et_al_2022
 
     include("1_table_1.jl")
 
-    # Write your package code here.
+    include("2_figure_1_a_c.jl")
+    include("2_figure_1_d.jl")
+    # include("2_figure_e.jl")
+
+
 
     function run()
-        create_table_1()
+        Replication_Carleton_et_al_2022.create_table_1()
         # create_figure_1()
     end
     export run
