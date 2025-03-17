@@ -142,7 +142,7 @@ for age in 1:3
     i = 1
     for y in 1:3
         for t in 1:3
-            println(age,i,y,t)
+            # println(age,i,y,t)
 
             # tmp_name_1 = string("pop",age,"per")
             # tmp_name_2 = string("pop",age,"per")
@@ -231,9 +231,10 @@ for y in 1:3
     for t in 1:3
         results_2_2010[y,i,t] = round(df_collapsed.pop_per[i],digits=2)
         results_2_2100[y,i,t] = round(df_collapsed.pop_per[i+9],digits=2)
-        i += 1
+        global i += 1
     end
 end
+i = nothing
 results_2_2010
 results_2_2100
 
@@ -269,4 +270,4 @@ results_2_2100
 
 # part_D_result = DataFrame(part_D_result, :auto)
 
-print("Figure 2: Part D done.")
+println("Figure 2: Part D done.")

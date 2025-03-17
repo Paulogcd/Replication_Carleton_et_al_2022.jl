@@ -232,6 +232,6 @@ results_part_c = leftjoin(df_test,df_collapsed_3,on=:ytile)
 # Y2 = nrow(df_collapsed) >= 4 ? df_collapsed[4, :max_loggdppc_adm1_avg] : missing
 # Y3 = nrow(df_collapsed) >= 7 ? df_collapsed[7, :max_loggdppc_adm1_avg] : missing
 
-varinfo()
+# varinfo()
 
-print("Figure 2: Parts A-C done.")
+println("Figure 2: Parts A-C done.")

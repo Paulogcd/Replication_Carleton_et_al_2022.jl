@@ -24,7 +24,7 @@ using Plots
 ### *----------------------------------
 
 # We also initialise an empty vector that will contain our plots: 
-vector_of_plots = Array{Plots.Plot{Plots.GRBackend}}(undef,3)
+vector_of_plots = Array{Plots.Plot{Plots.GRBackend}}(undef,3,9)
 
 ### foreach age of numlist 1/3
 for age in 1:3 # age = 1
@@ -299,14 +299,14 @@ for age in 1:3 # age = 1
                         
                         # We just evaluate:
                         line .= line .+ to_add
-                        print("This should not appear.")
+                        println("This should not appear.")
                         # The problem comes from loaded coefficients from the ster file. 
                         # However, this seems to also have the same behavior in the original replication package.
                     end
                 end
             end
 
-            print(line)
+            println(line)
 
             # The authors then do: 
             ### predictnl yhat_poly`o'_pop = `line', se(se_poly`o'_pop) ci(lowerci_poly`o'_pop upperci_poly`o'_pop)
@@ -318,7 +318,8 @@ for age in 1:3 # age = 1
             # This is already done, and line does not contain a formula, but the values directly.
 
             yhat_poly4_pop = line
-            print("Figure 2: Part Polynomial (4) done")
+            println(" ")
+            println("Figure 2: Part Polynomial (4) done for age = ", age, ", y = ", y, ", T = ", T, ", ii = ", ii)
 
             ### ______________________WARNING______________________: 
             # The above issue has been examined in detail.
@@ -370,15 +371,95 @@ for age in 1:3 # age = 1
             # lwidth(medthick) sets the line width to medium thickness.
 
             # In this sense, we can try: 
-            vector_of_plots[age] = Plots.plot(loaded_df.tavg_poly_1_GMFD, yhat_poly4_pop, color=:black, linewidth=2, label="Prediction")
+            vector_of_plots[age,ii] = 
+            Plots.plot(loaded_df.tavg_poly_1_GMFD, yhat_poly4_pop, color=:black, linewidth=2, label="Prediction")
             # fill_between = fill_between = fill_between = plot!(tavg_poly_1_GMFD, lowerci_poly4_pop, upperci_poly4_pop, fillalpha=0.25, color=:gray, label="95% CI")
 
-        end
-    end
-end
+            ### *----------------------------------
+			### * Set axes and titles
+			### *----------------------------------
 
-vector_of_plots[1]
-vector_of_plots[2]
-vector_of_plots[3]
+            ### loc ytit "Deaths per 100k"
+			### loc xtit "Temperature (°C)"
+			### loc empty ""
+			### loc space "" ""
+            ytit = "Deaths per 100k"
+            xtit = "Temperature (°C)"
+            empty = ""
+            space = " "
 
-print("Figure 2: part E done.")
+            ### if `ii' == 7 | `ii' == 4 {
+			### 	loc ylab "ytitle(`ytit') ylabel(, labsize(small))"
+			### 	loc xlab "xtitle(`space') xlabel(none) xscale(off) fysize(25.2)"
+			### } 
+            if ii == 7 | ii ==4
+                # ylab = string("ytitle(",$ytit,") ylabel(, labsize(small))")
+                # xlab = string("xtitle(",$space,") xlabel(none) xscale(off) fysize(25.2)")
+            end
+
+            # ...
+
+            ### *----------------------------------
+			### * Plot charts
+			### *----------------------------------
+
+            ### if `ycommon' == 1 {
+			### 	twoway `graph_conc' ///
+			### 	, yline(0, lcolor(red%50) lwidth(vvthin)) name(matrix_Y`y'_T`T'_noSE, replace) ///
+			### 	`xlab' `ylab' plotregion(icolor(white) lcolor(black)) ///
+			### 	graphregion(color(white)) legend(off) ///						
+			### 	text(`a`age'_y' `a_x' "{bf:%POP 2010: `a`age'_Y`y'T`T'_g_2010'}", place(ne) size(small)) ///
+			### 	text(`a`age'_y' `a_x' "{bf:%POP 2100: `a`age'_Y`y'T`T'_g_2100'}", place(se) color(gray) size(small))
+			### }
+            if ycommon == 1
+                
+            # ...
+
+            ### else {
+			### 	twoway `graph_conc' ///
+			### 	, yline(0, lcolor(gs5) lwidth(vthin)) name(matrix_Y`y'_T`T'_noSE, replace) ///
+			### 	`xlab' `ylab' plotregion(icolor(white) lcolor(black)) ///
+			### 	graphregion(color(white)) legend(off) 
+			### }
+            else
+                # ...
+            end
+
+            ii += 1
+
+        end # end of T loop
+    end # end of y loop
+end # end of age loop
+
+vector_of_plots
+
+Plots.plot(vector_of_plots[1,1])
+Plots.plot(vector_of_plots[1,2])
+Plots.plot(vector_of_plots[1,3])
+Plots.plot(vector_of_plots[1,4])
+Plots.plot(vector_of_plots[1,5])
+Plots.plot(vector_of_plots[1,6])
+Plots.plot(vector_of_plots[1,7])
+Plots.plot(vector_of_plots[1,8])
+Plots.plot(vector_of_plots[1,9])
+Plots.plot(vector_of_plots[2,1])
+Plots.plot(vector_of_plots[2,2])
+Plots.plot(vector_of_plots[2,3])
+Plots.plot(vector_of_plots[2,4])
+Plots.plot(vector_of_plots[2,5])
+Plots.plot(vector_of_plots[2,6])
+Plots.plot(vector_of_plots[2,7])
+Plots.plot(vector_of_plots[2,8])
+Plots.plot(vector_of_plots[2,9])
+Plots.plot(vector_of_plots[3,1])
+Plots.plot(vector_of_plots[3,2])
+Plots.plot(vector_of_plots[3,3])
+Plots.plot(vector_of_plots[3,4])
+Plots.plot(vector_of_plots[3,5])
+Plots.plot(vector_of_plots[3,6])
+Plots.plot(vector_of_plots[3,7])
+Plots.plot(vector_of_plots[3,8])
+Plots.plot(vector_of_plots[3,9])
+
+# Plots.plot()
+println("Figure 2: part E done.")
