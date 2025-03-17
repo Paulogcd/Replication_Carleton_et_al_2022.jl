@@ -1,7 +1,14 @@
 
 # This file is dedicated to reproducing the first table of descriptive statistics of the article.
 # It is the equivalent of the "/carleton_mortality_2022/1_estimation/estimate.do" file of the original replication package.
-# Each step is carefully commented. The original STATA code is always preceeded by three "#" symbols: ###.
+
+#______________________Particular notes______________________: 
+# We tried to carefully comment each step.
+# The original STATA code is always preceeded by three "#" symbols: ###.
+# GC.gc() is the garbage collector command in Julia.
+# It will allow us to have less memory used while compiling and running the package.
+# varinfo() allows to check all the variables currently used in Julia.
+# It appears several times throughout the code in comments, due to previous memory checks.
 
 # Loading the required packages in Julia: 
 using Pkg 

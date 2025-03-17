@@ -1,15 +1,22 @@
-# This file is dedicated to the replication of the figure 1 of the 
-# article. 
+# This file is dedicated to the replication of the parts A to C of the file creating the figure 1 of the article. 
+# This is the equivalent of: 
+# carleton_mortality_2022/1_estimation/3_regressions/3_age_spec_interacted/Figure_I_array_plots.do
 
+# Loading the required packages in Julia: 
 using Statistics
 using CategoricalArrays
 using CSV
 using DataFrames
 using ReadStatTables
 
-GC.gc()
+#______________________Particular notes______________________: 
+# We tried to carefully comment each step.
+# The original STATA code is always preceeded by three "#" symbols: ###.
+# GC.gc() is the garbage collector command in Julia.
+# It will allow us to have less memory used while compiling and running the package.
+# varinfo() allows to check all the variables currently used in Julia.
+# It appears several times throughout the code in comments, due to previous memory checks.
 
-# varinfo()
 
 ### In parts A and B, the authors set some variables for the rest of the code. 
 ### STATA:
@@ -48,12 +55,10 @@ suffix = ""
 df = DataFrame(ReadStatTables.readstat("0_input/final_data/global_mortality_panel_covariates.dta"))
 
 
+# To obtain the french subset of the data, we could run: 
 # df_fr = filter(row -> row.adm0 == "France", df)
-# DO NOT RUN THIS : 
-# df_fr = select(df, df.adm0 .== "France")
-# "France" ∈ unique(df.adm0)
-
 # varinfo()
+
 ### Here, the authors generate terciles of income and tmean.
 
 ### STATA:
@@ -180,7 +185,7 @@ df_collapsed = combine(groupby(df_merged, [:ytile, :ttile]),
     :loggdppc_adm1_avg => mean => :loggdppc_adm1_avg_mean,
     :lr_tavg_GMFD_adm1_avg => mean => :lr_tavg_GMFD_adm1_avg_mean
 )
-# Here, we have slightl different results compared to the STATA output. 
+# Here, we have slightly different results compared to the STATA output. 
 
 ### sort ttile
 ### by ttile: egen max_lr_tavg_GMFD_adm1_avg = max(lr_tavg_GMFD_adm1_avg)
@@ -195,11 +200,11 @@ df_collapsed_2 = combine(groupby(df_merged, :ttile),
                        :lr_tavg_GMFD_adm1_avg => maximum => :max_lr_tavg_GMFD_adm1_avg)
 
 
-df_test = leftjoin(df_collapsed,df_collapsed_2,on=:ttile,makeunique=true)                       
+df_test = leftjoin(df_collapsed,df_collapsed_2,on=:ttile,makeunique=true)
 # Here, the threshholds are a it amplified.
 # From 9,13,22, we get 10,15,28. 
 
-# Former version: 
+# Former version, kept for the record:
 # Extract the maximum values for specific indices, if they exist
 # T1 = nrow(df_collapsed_2) >= 1 ? df_collapsed_2[1, :max_lr_tavg_GMFD_adm1_avg] : missing
 # T2 = nrow(df_collapsed_2) >= 4 ? df_collapsed_2[4, :max_lr_tavg_GMFD_adm1_avg] : missing
@@ -219,9 +224,14 @@ df_collapsed_3 = combine(groupby(df_test, :ytile),
 # The values are closer this time.
 
 results_part_c = leftjoin(df_test,df_collapsed_3,on=:ytile)
+# We have almost perfectly identic results.
 
-# Former version : 
+# Former version, kept for the record:
 # Extract the maximum values for specific indices, if they exist
 # Y1 = nrow(df_collapsed) >= 1 ? df_collapsed[1, :max_loggdppc_adm1_avg] : missing
 # Y2 = nrow(df_collapsed) >= 4 ? df_collapsed[4, :max_loggdppc_adm1_avg] : missing
 # Y3 = nrow(df_collapsed) >= 7 ? df_collapsed[7, :max_loggdppc_adm1_avg] : missing
+
+varinfo()
+
+print("Figure 2: Parts A-C done.")

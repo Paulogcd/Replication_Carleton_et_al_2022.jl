@@ -1,4 +1,8 @@
-# 
+# This file is dedicated to the replication of the part D of the file creating the figure 1 of the article. 
+# This is the equivalent of: 
+# carleton_mortality_2022/1_estimation/3_regressions/3_age_spec_interacted/Figure_I_array_plots.do
+
+
 # ### STATA:
 # ### PART D. Construct Pop Figures
 # ### use "`DATA'/2_cleaned/covar_pop_count.dta", clear
@@ -59,7 +63,6 @@ covar_pop_count.pop1 = covar_pop_count.popshare1.*covar_pop_count.pop
 covar_pop_count.pop2 = covar_pop_count.popshare2.*covar_pop_count.pop
 covar_pop_count.pop3 = covar_pop_count.popshare3.*covar_pop_count.pop
 covar_pop_count = covar_pop_count[covar_pop_count.popshare2 .>= 0, :]
-
 
 # Former version:
 # # Generate new population shares and calculate pop1, pop2, pop3
@@ -126,7 +129,6 @@ df_collapsed.pop3_per = (df_collapsed.pop3./df_collapsed.pop3_tot).*100
 ### }
 
 
-
 # Here, we are going to try to use an array, instead of the variables names that STATA use.
 
 # Initialisation of loop: 
@@ -167,7 +169,9 @@ end
 results_1_2010
 results_1_2100
 
-# Former version: 
+# We obtain similar results, with a different dimension of our object. 
+
+# Former version, kept for the record:
 # # Using groupby and combine to calculate total population by year
 # covar_pop_count_collapsed = combine(groupby(covar_pop_count, [:ytile, :ttile, :year]),
 #                                     :pop => sum, :pop1 => sum, :pop2 => sum, :pop3 => sum)
@@ -199,7 +203,6 @@ results_1_2100
 #         end
 #     end
 # end
-# 
 
 
 ### Now, the authors do:
@@ -234,8 +237,8 @@ end
 results_2_2010
 results_2_2100
 
-
-# # Total age shares for 2010 and 2100
+# Former version, kept for the record:
+# Total age shares for 2010 and 2100
 # total_age_pop_2010 = []
 # total_age_pop_2100 = []
 # 
@@ -247,21 +250,23 @@ results_2_2100
 #     end
 # end
 # 
-# # Restore the original data if needed (we don't need restore in Julia)
+#
 
 # df_collapsed 
 
 # The authors then restore, obtaining: 
-part_D_result = ["ytile"	"ttile"	"loggdppc_adm1_avg"	"lr_tavg_GMFD_adm1_avg"	"max_lr_tavg_GMFD_adm1_avg"	"max_loggdppc_adm1_avg"
-1	3	8.962444	22.9691	22.9691	9.024742
-1	1	8.827487	7.957425	9.160113	9.024742
-1	2	9.024742	13.51241	13.51241	9.024742
-2	2	9.995737	13.37068	13.51241	9.995737
-2	3	9.902338	19.6678	22.9691	9.995737
-2	1	9.950479	9.160113	9.160113	9.995737
-3	3	10.2809	18.52221	22.9691	10.33297
-3	2	10.32087	12.88194	13.51241	10.33297
-3	1	10.33297	8.609725	9.160113	10.33297
-]
+# part_D_result = ["ytile"	"ttile"	"loggdppc_adm1_avg"	"lr_tavg_GMFD_adm1_avg"	"max_lr_tavg_GMFD_adm1_avg"	"max_loggdppc_adm1_avg"
+# 1	3	8.962444	22.9691	22.9691	9.024742
+# 1	1	8.827487	7.957425	9.160113	9.024742
+# 1	2	9.024742	13.51241	13.51241	9.024742
+# 2	2	9.995737	13.37068	13.51241	9.995737
+# 2	3	9.902338	19.6678	22.9691	9.995737
+# 2	1	9.950479	9.160113	9.160113	9.995737
+# 3	3	10.2809	18.52221	22.9691	10.33297
+# 3	2	10.32087	12.88194	13.51241	10.33297
+# 3	1	10.33297	8.609725	9.160113	10.33297
+# ]
 
-part_D_result = DataFrame(part_D_result, :auto)
+# part_D_result = DataFrame(part_D_result, :auto)
+
+print("Figure 2: Part D done.")

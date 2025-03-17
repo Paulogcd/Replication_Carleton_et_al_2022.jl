@@ -1,6 +1,11 @@
-using DataFrames, GLM, Plots, StatsBase
+# This file is dedicated to the replication of the part E of the file creating the figure 1 of the article. 
+# This is the equivalent of: 
+# carleton_mortality_2022/1_estimation/3_regressions/3_age_spec_interacted/Figure_I_array_plots.do
 
+# using DataFrames, GLM, Plots, StatsBase
+using Plots
 
+# In case we did not perform the previous files (2_figure_1_a_c.jl and 2_figure_1_d.jl): 
 
 # df = DataFrame(readdta("3_final/global_mortality_panel_covariates.dta"))
 # covar_pop_count = DataFrame(ReadStatTables.readstat("0_input/final_data/global_mortality_panel_covariates.dta"))
@@ -18,14 +23,17 @@ using DataFrames, GLM, Plots, StatsBase
 ### *generating age-specific plots
 ### *----------------------------------
 
+# We also initialise an empty vector that will contain our plots: 
+vector_of_plots = Array{Plots.Plot{Plots.GRBackend}}(undef,3)
+
 ### foreach age of numlist 1/3
-for age in 1:3
+for age in 1:3 # age = 1
     
     ### use `MORTALITY_TEMP', clear
 	### merge m:1 adm1_code using "`tercile'"
 	### drop if ytile==.
 
-    df_merged = dropmissing(innerjoin(df,df_tercile, on=:adm1_code, makeunique=true), :ytile)
+    df_merged = dropmissing(innerjoin(df,df_tercile, on=:adm1_code, makeunique=true), :ytile) ## CURENT DF LOADED
 
 	### foreach y of numlist 1/3 {
 	### 	foreach T of numlist 1/3 {
@@ -33,17 +41,25 @@ for age in 1:3
 	### 		local obs_`y'_`T'_`age' = r(N)
 	### 	}
 	### }
+
+    # Similarily to earlier, we are going to use an array to store these data: 
     observations = Array{Float64}(undef,3,3)
     fill!(observations,0)
     for y in 1:3
         for T in 1:3
-            tmp = sum(df_merged.ytile .== y .|| df_merged.ttile .== T .|| df_merged.agegroup == age)
+            tmp1 = df_merged[df_merged.ytile .== y,:]
+            tmp2 = tmp1[tmp1.ttile .== T,:]
+            tmp3 = tmp2[tmp2.agegroup .== age,:]
+            tmp = size(tmp3)[1]
+
+            # Former version : 
+            # tmp = sum(df_merged.ytile .== y .&& df_merged.ttile .== T .&& df_merged.agegroup == age)
             observations[y,T] = tmp
         end
     end
-    observations
-
-    # 1 ∈  df_merged.agegroup
+    tmp = tmp1 = tmp2 = tmp3 = nothing # We clear the data
+    GC.gc() # And call the garbage collector
+    observations # We obtain very close results.
 
     ### 	collapse (mean) loggdppc_adm1_avg lr_tavg_GMFD_adm1_avg, by(ytile ttile)
     df_collapsed = combine(groupby(df_merged, [:ytile, :ttile]),
@@ -56,35 +72,39 @@ for age in 1:3
 
     df_collapsed.tavg_poly_1_GMFD .= NaN
     df_collapsed.deathrate_w99 .= NaN
-			
+	# df_collapsed
+
     ### local ii = 1    
     ### foreach y of numlist 1/3 {
 	### 	foreach T of numlist 1/3 {
-    for y in 1:3
-        for T in 1:3
+    ii = 1
+    for y in 1:3 # y=1
+        for T in 1:3 # T = 1
 
             ### preserve
 			### keep if ytile == `y' & ttile == `T'
 
+            filtered_df = df_collapsed[df_collapsed.ytile .== y .&& df_collapsed.ttile .== T, :]
+            # Checked: same result.
+
             ###     foreach var in "loggdppc_adm1_avg" "lr_tavg_GMFD_adm1_avg" {
             ###         loc zvalue_`var' = `var'[1]
             ###     }
+
+            # This time, due to the specific names of the variables, we use a dictionary instead of an array.
+            variables = ["loggdppc_adm1_avg", "lr_tavg_GMFD_adm1_avg"]
+            zvalues = Dict()
+            for vari in variables
+                zvalues[vari] = filtered_df[1, vari]  # Assign the first value of the variable
+            end
+            # Check: we obtain the same values at 2 digits.
             
             ###     *obs	
             ###     local min = `x_min'
             ###     local max = `x_max'
             ###     local obs = `max' - `min' + 1
             ###     local omit = 20
-    
-            # tmp_df_collapsed = filter(df_collapsed, df_collapsed.ytile .== y)
 
-            filtered_df = df_collapsed[df_collapsed.ytile .== y .&& df_collapsed.ttile .== T, :]
-            # Iterate over the specified variables
-            variables = ["loggdppc_adm1_avg", "lr_tavg_GMFD_adm1_avg"]
-            zvalues = Dict()
-            for var in variables
-                zvalues[var] = filtered_df[1, var]  # Assign the first value of the variable
-            end
             # Setting local variables
             min_value = x_min
             max_value = x_max
@@ -95,29 +115,55 @@ for age in 1:3
 			### set obs `obs'
 			### replace tavg_poly_1_GMFD = _n + `min' - 1
 
-            df_collapsed = DataFrame()
-            df_collapsed = DataFrame(tavg_poly_1_GMFD = 1:obs)
-            # Replace values in the variable tavg_poly_1_GMFD
-            df_collapsed.tavg_poly_1_GMFD = df_collapsed.tavg_poly_1_GMFD .+ min_value .- 1
+            # This now is a bit more delicate to interpret. 
+            # This STATA code deletes the currently loaded dataset, and create a vector of 46 dimensions named "tavg_poly_1_GMFD". 
+            # The STATA code refers to it as "tavg_poly_1_GMFD", but if we were to perform the exact same operation, we would need 
+            # to delete the dataframe, and create a new one, with empty values, and only a non-empty "tavg_poly_1_GMFD" column.
+            # This is not convenient, we can therefore just create a new variable.
+
+            # for i in (1:size(df_collapsed)[1])
+            #     delete!(df_collapsed, [1])
+            # end
+            # df_collapsed
+
+            tavg_GMFD_adm1_avg = obs = x_min:x_max
+
+            # This does not correspond to the STATA code, but is a fair approximation. 
+            # We have a vector containing what they have in their loaded dataframe. 
+            # To be complete, we can try: 
+
+            # names(df_collapsed)
+            # ytile                       = zeros(size(obs))
+            # ttile                       = zeros(size(obs))
+            # loggdppc_adm1_avg           = zeros(size(obs))
+            # lr_tavg_GMFD_adm1_avg       = obs
+            # tavg_poly_1_GMFD            = zeros(size(obs))
+            # deathrate_w99               = zeros(size(obs))
+
+            loaded_df = DataFrame(            
+            ytile                       = zeros(size(obs)), 
+            ttile                       = zeros(size(obs)), 
+            loggdppc_adm1_avg           = zeros(size(obs)), 
+            lr_tavg_GMFD_adm1_avg       = zeros(size(obs)),
+            tavg_poly_1_GMFD            = obs,
+            deathrate_w99               = zeros(size(obs)))
+
+            # tavg_poly_1_GMFD
 
             ### *----------------------------------
 			### *Polynomial (4) 
 			### *----------------------------------
 
-            # data = read("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster",String)
-            # data = readstat("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster")
-            # data = readstat("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/data.txt")
-
-            # run(`touch 0_input/ster/data.txt`)
-            # run(`cat 0_input/ster/Agespec_interaction_response.ster ">" 0_input/ster/data.txt`)
-            # data = read("0_input/ster/data.txt", String)
+            ### * estimate use "`STER'/Agespec_interaction_response.ster"
+			### estimate use "/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster"
+			### estimates
             
             # This part was very tricky, and time consuming.
             # The .ster format is not supported by Julia.
             # I had to run on STATA: 
             ### estimate use "/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster"
             ### estout using coefficients.csv, replace cells(b se t p) varlabels(_cons Constant) stats(N r2_a, labels("Observations" "Adj. R-squared")) delimiter(",")
-            # To obtain a csv file with equivalent data. 
+            # To obtain a csv file with partial equivalent data. 
             # This export fashion led to some complication, due to to format issue. 
             # In the following section, I use a workaround to create an acceptable csv file.
 
@@ -149,39 +195,62 @@ for age in 1:3
             data = tryparse.(Float64, data[:, :])
             # data
 
+            # Former version, kept for the record:
+            # data = read("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster",String)
+            # data = readstat("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster")
+            # data = readstat("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/data.txt")
+
+            # run(`touch 0_input/ster/data.txt`)
+            # run(`cat 0_input/ster/Agespec_interaction_response.ster ">" 0_input/ster/data.txt`)
+            # data = read("0_input/ster/data.txt", String)
+
+            # Then, the authors do:
+
+            ### *uninteracted terms
+			### local line = "_b[`age'.agegroup#c.tavg_poly_1_GMFD]*(tavg_poly_1_GMFD-`omit')"
+
             # Here, the STATA syntax can be confusing. 
             # Indeed, this program stores a "line" macro that is a formula, only 
             # used a the end of the loop. 
 
-            # This can be handled by the Symbol() objects of Julia ?
+            # The "_b[]" syntax in STATA refers to estimates.
+            # Since we have loaded the "data" dataframe, we can use "data[:,name]" each time STATA refers to "_b[name]".
+
+            # This could be handled by the Symbol() objects of Julia.
             # We could also try to assess the "line" and "add" variables bit by bit.
 
-            ### *uninteracted terms
-			### local line = "_b[`age'.agegroup#c.tavg_poly_1_GMFD]*(tavg_poly_1_GMFD-`omit')"
-			### foreach k of numlist 2/`o' {
-			### 	*replace tavg_poly_`k'_GMFD = tavg_poly_1_GMFD ^ `k'
-			### 	local add = "+ _b[`age'.agegroup#c.tavg_poly_`k'_GMFD]*(tavg_poly_1_GMFD^`k' - `omit'^`k')"
-			### 	local line "`line' `add'"
-			### 	}
-            # "$age.agegroup#c.tavg_poly_1_GMFD"
-            
+            # First, let us define a Julia symbol, to contain the name of the variable that contains "." and "#", 
+            # which are both special characters in Julia. 
             tmp = Symbol("$age.agegroup#c.tavg_poly_1_GMFD")
-            # line = Symbol("(data[:,$tmp].*df_collapsed.tavg_poly_1_GMFD) .- $omit")
-            line = (data[:,tmp].*df_collapsed.tavg_poly_1_GMFD) .- omit
+            # line = Symbol("(data[:,$tmp].*tavg_poly_1_GMFD) .- $omit") # Former attempt 
+            # Then, we can directly evaluate: 
+            line = (data[:,tmp].*tavg_GMFD_adm1_avg) .- omit
+            # This is consistent with what we obtain via STATA, i.e. a 46-dimensions vector. 
+
+            # Former attempts, kept for the record:
             # data[:,tmp]
             # line = Symbol("(data.'$tmp'.*df_collapsed.tavg_poly_1_GMFD) .- $omit")
-            
             # line = string(line)
             # line
             # line_parse = Meta.parse(line)
 
-            # uninteracted terms
-            for k in 2:o
+            # Then, the authors do: 
+
+            ### foreach k of numlist 2/`o' {
+			### 	*replace tavg_poly_`k'_GMFD = tavg_poly_1_GMFD ^ `k'
+			### 	local add = "+ _b[`age'.agegroup#c.tavg_poly_`k'_GMFD]*(tavg_poly_1_GMFD^`k' - `omit'^`k')"
+			### 	local line "`line' `add'"
+			### 	}
+
+            for k in 2:o # k=2
                 tmp = string(age,".agegroup#c.tavg_poly_",k,"_GMFD")
                 tmp = Symbol(tmp)
                 # *(tavg_poly_1_GMFD^`k' - `omit'^`k')
                 # add = Symbol("+ data[:,$tmp].*")
-                to_add = (data[:,tmp].*(df_collapsed.tavg_poly_1_GMFD.^k .- omit^k)) 
+                to_add = (data[:,tmp].*(loaded_df.tavg_poly_1_GMFD .^ k .- omit^k)) 
+                # data[:,tmp]
+                # df_collapsed.tavg_poly_1_GMFD .^ k 
+                # omit^k
                 # add = Symbol("+ data[:,tmp].*(df_collapsed.tavg_poly_1_GMFD.^$k .- omit^$k)")
                 
                 ### local line "`line' `add'"
@@ -190,31 +259,72 @@ for age in 1:3
             end
 
             # lgdppc and Tmean at the tercile mean
-            
-            if false # The source of their original variable is still to determine.
+
+            ### *lgdppc and Tmean at the tercile mean
+			### foreach var in "loggdppc_adm1_avg" "lr_tavg_GMFD_adm1_avg" {
+			### 	loc z = `zvalue_`var''
+			### 	foreach k of numlist 1/`o' {
+			### 		*replace tavg_poly_`k'_GMFD = tavg_poly_1_GMFD ^ `k'
+			### 		local add = "+ _b[`age'.agegroup#c.`var'#c.tavg_poly_`k'_GMFD] * (tavg_poly_1_GMFD^`k' - `omit'^`k') * `z'"
+			### 		local line "`line' `add'"
+			### 		}
+			### 	}
+
+            # This is bugging. 
+            # The source of their original variable is still to determine.
+            if false 
                 for vari in ["loggdppc_adm1_avg" ,"lr_tavg_GMFD_adm1_avg"]
                     z = string("zvalue_",vari)
                     for k in 1:o
+                        
+                        # Directly translating from the STATA code: 
+                        ### local add = "+ _b[`age'.agegroup#c.`var'#c.tavg_poly_`k'_GMFD] * (tavg_poly_1_GMFD^`k' - `omit'^`k') * `z'"
+
                         tmp = string(age,".agegroup#c.",vari,"#c.tavg_poly_",k,"_GMFD")
                         tmp = Symbol(tmp)
-                        to_add = data[:,tmp] .* df_collapsed[:,tavg_poly_1_GMFD]^k .- omit^k # .* z 
+                        # However, this yields a name that is not in the estimates data: 
+                        tmp ∈ names(data) # false !!!
+                        # If we use data[:,tmp] with the current value of tmp, this yields an empty vector for "line".
+                        
+                        # data[:"1.agegroup#c.loggdppc_adm1_avg"]
+                        # to_add = data[:,tmp] .* loaded_df[:,loaded_df.tavg_poly_1_GMFD]^k .- omit^k # .* z 
+                        
+                        # data[:,"1.agegroup#c.loggdppc_adm1_avg"]
+                        "1.agegroup#c.tavg_poly_1_GMFD" ∈ names(data) # This exists in the data,
+                        "1.agegroup#c.loggdppc_adm1_avg" ∈ names(data) # This does not exists in the data.
+                        
                         ### local add = "+ _b[`age'.agegroup#c.`var'#c.tavg_poly_`k'_GMFD] * (tavg_poly_1_GMFD^`k' - `omit'^`k') * `z'"
                         # df_collapsed[:,z]
                         # Ambiguous... Where is the z? 
                         
-                        # local line line add ? 
                         # We just evaluate:
                         line .= line .+ to_add
                         print("This should not appear.")
+                        # The problem comes from loaded coefficients from the ster file. 
+                        # However, this seems to also have the same behavior in the original replication package.
                     end
                 end
             end
 
             print(line)
 
+            # The authors then do: 
             ### predictnl yhat_poly`o'_pop = `line', se(se_poly`o'_pop) ci(lowerci_poly`o'_pop upperci_poly`o'_pop)
 
-            # yhat_poly'o'_pop = line
+            # This STATA command serves to run the mentioned model (by line), and specifies the standard errors, 
+            # and confidence intervals.
+            
+            # In our attempt, we can just take the values of the "line" vector.
+            # This is already done, and line does not contain a formula, but the values directly.
+
+            yhat_poly4_pop = line
+            print("Figure 2: Part Polynomial (4) done")
+
+            ### ______________________WARNING______________________: 
+            # The above issue has been examined in detail.
+            # To the best of our knowledge, this discrepancy of results is due to differences in the "data" DataFrame,
+            # containing the estimates.
+            # The estimates from the original replication package have been put in a file "0_input/estimates.csv".
 
             ### *----------------------------------
 			### * Clipping
@@ -226,7 +336,11 @@ for age in 1:3
 			### 		replace `var' = `yclipmin_a`age'' if `var' < `yclipmin_a`age''
 			### 	}
 			### }
-            if (yclip == 1)
+            
+            # This STATA code is replicable due to the lack of data from the "predict" command. 
+            # Indeed, we do not have the lower and upper confidence intervals in our simplified version.
+            
+            if (yclip == 1) & false # prohibiting condition
                 # string("yhat_poly",o,"_pop")
                 varlist = [string("yhat_poly",o,"_pop"), string("lowerci_poly",o,"_pop"), string("upperci_poly",o,"_pop")]
                 for vari in varlist
@@ -237,7 +351,7 @@ for age in 1:3
                     tmp2 = string("yclipmin_a$age")
                     tmp2 = Symbol(tmp2)
                     # eval(tmp2)
-
+                    
                     if vari > eval(tmp1)
                         vari = eval(tmp1)
                     elseif vari < eval(tmp2)
@@ -247,19 +361,24 @@ for age in 1:3
             end
 
             ### local graph_`ii' "(line yhat_poly4_pop tavg_poly_1_GMFD, lc(black) lwidth(medthick)) (rarea lowerci_poly4_pop upperci_poly4_pop tavg_poly_1_GMFD, col(gray%25) lwidth(none))" display("saved `graph_`ii'' `ii'")
-            # ? 
-            # line
-            # Sample data (replace with real data)
-            using Plots
-            tavg_poly_1_GMFD = collect(-10:0.1:10)  # X-axis values
-            yhat_poly4_pop = sin.(tavg_poly_1_GMFD) # Predicted values
-            lowerci_poly4_pop = yhat_poly4_pop .- 0.2 # Lower bound
-            upperci_poly4_pop = yhat_poly4_pop .+ 0.2 # Upper bound
-
             
-            plot(tavg_poly_1_GMFD, yhat_poly4_pop, color=:black, linewidth=2, label="Prediction")
-            fill_between = fill_between = fill_between = plot!(tavg_poly_1_GMFD, lowerci_poly4_pop, upperci_poly4_pop, fillalpha=0.25, color=:gray, label="95% CI")
+            # This STATA command creates a "graph" object, such that:
+
+            # yhat_poly4_pop is the Y-variable (predicted values)
+            # tavg_poly_1_GMFD is the X-variable 
+            # lc(black) sets the line color to black.
+            # lwidth(medthick) sets the line width to medium thickness.
+
+            # In this sense, we can try: 
+            vector_of_plots[age] = Plots.plot(loaded_df.tavg_poly_1_GMFD, yhat_poly4_pop, color=:black, linewidth=2, label="Prediction")
+            # fill_between = fill_between = fill_between = plot!(tavg_poly_1_GMFD, lowerci_poly4_pop, upperci_poly4_pop, fillalpha=0.25, color=:gray, label="95% CI")
 
         end
     end
 end
+
+vector_of_plots[1]
+vector_of_plots[2]
+vector_of_plots[3]
+
+print("Figure 2: part E done.")
