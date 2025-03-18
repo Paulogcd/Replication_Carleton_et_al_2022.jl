@@ -7,8 +7,11 @@
 # ### PART D. Construct Pop Figures
 # ### use "`DATA'/2_cleaned/covar_pop_count.dta", clear
 # ### rename (loggdppc tmean) (lgdppc Tmean)
-# 
 
+
+# Ensures that the data is available:
+load_covar_pop_count()
+# Read it: 
 covar_pop_count = DataFrame(ReadStatTables.readstat("0_input/cleaned_data/covar_pop_count.dta"))
 # covar_pop_count_fr = filter(row -> startswith(row.region, "FR"), covar_pop_count)
 rename!(covar_pop_count, :loggdppc => :lgdppc, :tmean => :Tmean)
@@ -270,4 +273,4 @@ results_2_2100
 
 # part_D_result = DataFrame(part_D_result, :auto)
 
-println("Figure 2: Part D done.")
+println("Compilation of figure 2: Part D done.")

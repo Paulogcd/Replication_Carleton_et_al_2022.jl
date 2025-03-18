@@ -51,9 +51,10 @@ suffix = ""
 #### PART C. Prepare Dataset
 ### use "$data_dir/3_final/global_mortality_panel_covariates.dta", clear
 
+# Ensuring that the data is loaded:
+load_global_mortality_panel_covariates()
 # !!! Caution : this file weights 2.6 Gb !!!
 df = DataFrame(ReadStatTables.readstat("0_input/final_data/global_mortality_panel_covariates.dta"))
-
 
 # To obtain the french subset of the data, we could run: 
 # df_fr = filter(row -> row.adm0 == "France", df)
@@ -234,4 +235,4 @@ results_part_c = leftjoin(df_test,df_collapsed_3,on=:ytile)
 
 # varinfo()
 
-println("Figure 2: Parts A-C done.")
+println("Compilation of figure 2: Parts A-C done.")

@@ -26,6 +26,8 @@ using Plots
 # We also initialise an empty vector that will contain our plots: 
 vector_of_plots = Array{Plots.Plot{Plots.GRBackend}}(undef,3,9)
 
+df_merged = dropmissing(innerjoin(df,df_tercile, on=:adm1_code, makeunique=true), :ytile) ## CURENT DF LOADED
+
 ### foreach age of numlist 1/3
 for age in 1:3 # age = 1
     
@@ -33,7 +35,8 @@ for age in 1:3 # age = 1
 	### merge m:1 adm1_code using "`tercile'"
 	### drop if ytile==.
 
-    df_merged = dropmissing(innerjoin(df,df_tercile, on=:adm1_code, makeunique=true), :ytile) ## CURENT DF LOADED
+    # We can set this outside the loop.
+    # df_merged = dropmissing(innerjoin(df,df_tercile, on=:adm1_code, makeunique=true), :ytile) ## CURENT DF LOADED
 
 	### foreach y of numlist 1/3 {
 	### 	foreach T of numlist 1/3 {
@@ -62,7 +65,7 @@ for age in 1:3 # age = 1
     observations # We obtain very close results.
 
     ### 	collapse (mean) loggdppc_adm1_avg lr_tavg_GMFD_adm1_avg, by(ytile ttile)
-    df_collapsed = combine(groupby(df_merged, [:ytile, :ttile]),
+    global df_collapsed = combine(groupby(df_merged, [:ytile, :ttile]),
         :loggdppc_adm1_avg => mean => :loggdppc_adm1_avg,
         :lr_tavg_GMFD_adm1_avg => mean => :lr_tavg_GMFD_adm1_avg)
 
@@ -84,7 +87,7 @@ for age in 1:3 # age = 1
             ### preserve
 			### keep if ytile == `y' & ttile == `T'
 
-            filtered_df = df_collapsed[df_collapsed.ytile .== y .&& df_collapsed.ttile .== T, :]
+            global filtered_df = df_collapsed[df_collapsed.ytile .== y .&& df_collapsed.ttile .== T, :]
             # Checked: same result.
 
             ###     foreach var in "loggdppc_adm1_avg" "lr_tavg_GMFD_adm1_avg" {
@@ -167,10 +170,13 @@ for age in 1:3 # age = 1
             # This export fashion led to some complication, due to to format issue. 
             # In the following section, I use a workaround to create an acceptable csv file.
 
+            # Ensuring data is available: 
+            load_coefficients()
+            # loading the data:
             data = CSV.read("0_input/ster/coefficients.csv", DataFrame)
             # coefficients, standard errors, t-statistics, p-value.
             tmp = Array{String}(undef,38)
-            for (index_row,row) in enumerate(2:4:size(data)[1])
+            for (index_row,row) in enumerate(3:4:size(data)[1])
                 tmp[index_row] = data[row,1]
                 
                 if tmp[index_row] == "Observations" # At the end, irregularity.
@@ -183,7 +189,8 @@ for age in 1:3 # age = 1
                 # println(tmp[index_row])
             end
             # data[3,1]
-            # We can delete the first line: 
+            # We can delete the two first lines: 
+            data = data[Not(1),:]
             data = data[Not(1),:]
             # This yields a csv with all the statistics, but with variables in rows.
             # data
@@ -193,7 +200,7 @@ for age in 1:3 # age = 1
 
             # Last thing: the data is currently in String... We want Floats!
             data = tryparse.(Float64, data[:, :])
-            # data
+            # data[1,1]
 
             # Former version, kept for the record:
             # data = read("/Users/paulogcd/Documents/Replication_Carleton_et_al_2022.jl/0_input/ster/Agespec_interaction_response.ster",String)
@@ -306,7 +313,7 @@ for age in 1:3 # age = 1
                 end
             end
 
-            println(line)
+            # println(line)
 
             # The authors then do: 
             ### predictnl yhat_poly`o'_pop = `line', se(se_poly`o'_pop) ci(lowerci_poly`o'_pop upperci_poly`o'_pop)
@@ -318,8 +325,8 @@ for age in 1:3 # age = 1
             # This is already done, and line does not contain a formula, but the values directly.
 
             yhat_poly4_pop = line
-            println(" ")
-            println("Figure 2: Part Polynomial (4) done for age = ", age, ", y = ", y, ", T = ", T, ", ii = ", ii)
+            # println(" ")
+            # println("Figure 2: Part Polynomial (4) done for age = ", age, ", y = ", y, ", T = ", T, ", ii = ", ii)
 
             ### ______________________WARNING______________________: 
             # The above issue has been examined in detail.
@@ -431,6 +438,8 @@ for age in 1:3 # age = 1
     end # end of y loop
 end # end of age loop
 
+# varinfo()
+
 vector_of_plots
 
 Plots.plot(vector_of_plots[1,1])
@@ -462,4 +471,4 @@ Plots.plot(vector_of_plots[3,8])
 Plots.plot(vector_of_plots[3,9])
 
 # Plots.plot()
-println("Figure 2: part E done.")
+println("Compilation of figure 2: part E done.")
