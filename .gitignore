@@ -1,6 +1,7 @@
 /Manifest.toml
 .vscode/
 docs/build/
-0_input/final_data/*
+0_input/final_data/global_mortality_panel_covariates.dta
+0_input/final_data/global_mortality_panel_public.dta
 utilities/ftp_connect
 src/.DS_Store
