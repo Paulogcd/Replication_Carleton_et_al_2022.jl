@@ -1,0 +1,11 @@
+https://github.com/Paulogcd/Replication_Carleton_et_al_2022.jl
+
+When precompiling on Nuvolos, we obtain:
+ 85 dependencies successfully precompiled in 170 seconds. 231 already precompiled.
+  1 dependency had output during precompilation:
+┌ Replication_Carleton_et_al_2022
+│  [ Info: Compilation of 0_input_data_1: Done.
+│  [ Info: Compilation of 0_input_data_2: Done.
+│  [ Info: Compilation of load(): Done.
+│  [ Info: Compilation of create_table_1(): Done
+│  [ Info: Compilation of create_figure_1(): Done

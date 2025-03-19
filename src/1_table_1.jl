@@ -185,7 +185,8 @@ end
 
 function pre_create_table_1()
     # To ensure that the required files are present: 
-    load_global_mortality_panel_covariates()
+    # load_global_mortality_panel_covariates()
+    load_global_mortality_panel_public()
 
     # First of all, the authors load the data:
     ### STATA:
@@ -599,7 +600,7 @@ function generate_table_1(results_table_1)
     # GC.gc()
 end
 
-# export create_table_1(pre_create_table_1())
+# export generate_table_1()
 
 """
 The function `create_table_1()` creates a `pdf` containing the replication result of the Figure 1.
@@ -618,5 +619,13 @@ end
 
 # It could also have been possible to access the latex version of the dataframe directly:
 # data_table_1 = latexify(results_table_1; env=:table, booktabs=true, latex=false)
+
+
+"""
+The functio 'delete_table_1()' deletes the pdf of the table 1 in the output folder.
+"""
+function delete_table_1()
+    rm("0_output/table_1.pdf")
+end
 
 @info ("Compilation of create_table_1(): Done")

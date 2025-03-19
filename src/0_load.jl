@@ -16,27 +16,31 @@ include("0_input_data_2.jl")
 The function `load` ensures that all the required data is in the local folder of the user. 
 It should be run before the `run` function of the package. 
 """
-function load()
+function load(;pwd::String=pwd())
 
-    total = 4
+    total = 5
     i = 1
 
     @info string("Beginning of the data and files loading.")
     
     @info string("Ensuring file 'global_mortality_panel_covariates.dta': ", i,"/", total)
-    load_global_mortality_panel_covariates() # Still has to be tested
+    load_global_mortality_panel_covariates(pwd=pwd) 
+    i += 1
+
+    @info string("Ensuring file 'global_mortality_panel_public.dta': ", i,"/", total)
+    load_global_mortality_panel_public(pwd=pwd)
     i += 1
 
     @info string("Ensuring file 'estimates.csv': ", i,"/", total)
-    load_Figure_1_estimates()
+    load_Figure_1_estimates(pwd=pwd)
     i += 1
 
     @info string("Ensuring file 'covar_pop_count.dta': ", i,"/", total)
-    load_covar_pop_count()
+    load_covar_pop_count(pwd=pwd)
     i += 1
 
     @info string("Ensuring file 'coefficients.csv': ", i,"/", total)
-    load_coefficients()
+    load_coefficients(pwd=pwd)
     i += 1
 
     println()
