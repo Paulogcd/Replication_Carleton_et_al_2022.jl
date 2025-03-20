@@ -15,7 +15,7 @@ include("0_input_data_2.jl")
 The function "create_folder_setup" creates the folders "0_input" (and its subfolders) and "0_output", that are necessary for the 
     other functions to run.
 """
-function create_folder_setup(;pwd::String=pwd())
+function create_folder_setup(;pwd::AbstractString=pwd())
     if !ispath(joinpath(pwd,"0_input/cleaned_data")) &&
         !ispath(joinpath(pwd,"0_input/final_data")) &&
         !ispath(joinpath(pwd,"0_input/ster")) &&
@@ -31,6 +31,8 @@ function create_folder_setup(;pwd::String=pwd())
         @info string("Correct folder structure already existing.")
     end
 end
+
+# create_folder_setup()
 
 function delete_folder_setup(;pwd::String=pwd())
     if ispath(joinpath(pwd,"0_input/cleaned_data")) || 
@@ -58,7 +60,7 @@ It should be run before the `run` function of the package.
 """
 function load(;pwd::String=pwd())
 
-    create_folder_setup()
+    create_folder_setup(pwd=pwd)
     total = 5
     i = 1
 
