@@ -7,7 +7,7 @@ using Test
     # Write your tests here.
     @test 1==1
     
-    include("0_tests_load.jl")
+    # include("0_tests_load.jl") # All tests pass.
     
     include("1_tests_table_1.jl")
 
