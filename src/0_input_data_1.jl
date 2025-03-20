@@ -17,7 +17,7 @@ function load_global_mortality_panel_covariates(;pwd::String=pwd())
         @info string("File ", path, " is already in your system.")
     elseif !isfile(path) # Check and only activates if you do not have the file in your computer:
         @info string("File ", path, " not found. Proceeding to download.")
-        url = "https://drive.usercontent.google.com/download?id=1MjvPVcYGqLUhMtywtZCgQekXbXPeCSjr&export=download&confirm=t"
+        url = "https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/0_input/final_data/global_mortality_panel_covariates.dta"
         @info string("Dowloading from: ", url)
         @warn string("The file weights 2 Gigabytes, and its downloading can take some time.")
         res = HTTP.get(url)
@@ -65,7 +65,7 @@ function load_global_mortality_panel_public(;pwd::String=pwd())
         @info string("File ", path, " is already in your system.")
     elseif !isfile(path) # Check and only activates if you do not have the file in your computer:
         @info string("File ", path, " not found. Proceeding to download.")
-        url = "https://drive.usercontent.google.com/download?id=1NAiteoHIzN79FSKRnUYNFxWs1VwE0dzG&export=download&confirm=t"
+        url = "https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/0_input/final_data/global_mortality_panel_public.dta"
         @info string("Dowloading from: ", url)
         @warn string("The file weights more than 2 Gigabytes, and its downloading can take some time.")
         res = HTTP.get(url)

@@ -695,9 +695,13 @@ function create_figure_1()
                 end
                 # loading the data:
                 data = CSV.read("0_input/ster/coefficients.csv", DataFrame)
+                # We can delete the three first lines: 
+                data = data[Not(1),:]
+                data = data[Not(1),:]
+                data = data[Not(1),:]
                 # coefficients, standard errors, t-statistics, p-value.
                 tmp = Array{String}(undef,38)
-                for (index_row,row) in enumerate(3:4:size(data)[1])
+                for (index_row,row) in enumerate(1:4:size(data)[1])
                     tmp[index_row] = data[row,1]
                     
                     if tmp[index_row] == "Observations" # At the end, irregularity.
@@ -710,9 +714,6 @@ function create_figure_1()
                     # println(tmp[index_row])
                 end
                 # data[3,1]
-                # We can delete the two first lines: 
-                data = data[Not(1),:]
-                data = data[Not(1),:]
                 # This yields a csv with all the statistics, but with variables in rows.
                 # data
                 # It is however easier to access variables if they are in the columns. 

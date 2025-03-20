@@ -16,7 +16,7 @@ function load_Figure_1_estimates(;pwd::String=pwd())
         @info string("File ", path ," is already in your system.")
     elseif !isfile(path) # Check and only activates if you do not have the file in your computer:
         @info string("File ", path, " not found. Proceeding to download.")
-        url = "https://docs.google.com/spreadsheets/d/1N1sdiNWikmy6ortqiHJ2UuAXcqZEOAymKv8mxVRqxwA/export?format=csv"
+        url = "https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/0_input/ster/estimates.csv"
         @info string("Dowloading from ", url)
         res = HTTP.get(url)
         body = res.body
@@ -61,7 +61,7 @@ function load_covar_pop_count(;pwd::String=pwd())
         @info string("File ", path ," is already in your system.")
     elseif !isfile(path) # Check and only activates if you do not have the file in your computer:
         @info string("File ", path, " not found. Proceeding to download.")
-        url = "https://drive.usercontent.google.com/download?id=1aLhbMGC0_dxzSfCZj7Q0120k4RClh3h4&export=download"
+        url = "https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/0_input/cleaned_data/covar_pop_count.dta"
         @info string("Dowloading from ", url)
         res = HTTP.get(url)
         tmp = String(res.body)
@@ -106,7 +106,7 @@ function load_coefficients(;pwd::String=pwd())
         @info string("File ", path ," is already in your system.")
     elseif !isfile(path) # Check and only activates if you do not have the file in your computer:
         @info string("File ", path, " not found. Proceeding to download.")
-        url = "https://docs.google.com/spreadsheets/d/1Dg4rIQuxsoT-HGQgNH7ZL0XeL0McpWlD4e7GUMOv-r0/export?format=csv"
+        url = "https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/0_input/ster/coefficients.csv"
         @info string("Dowloading from ", url)
         res = HTTP.get(url)
         body = res.body
