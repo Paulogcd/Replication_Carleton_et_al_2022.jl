@@ -9,7 +9,7 @@ using DataFrames
 The function `loading_Figure_1_estimates` ensures that the file "estimates.csv" is in your input folder. 
 It is necessary for the replication of the Figure 1 of the article.
 """
-function load_Figure_1_estimates(;pwd::String=pwd())
+function load_Figure_1_estimates(;pwd::AbstractString=pwd())
     path = "0_input/ster/estimates.csv"
     path = string(pwd,"/",path)
     if isfile(path)
@@ -34,7 +34,7 @@ end
 """
 The function `delete_Figure_1_estimates` deletes the file "estimates.csv" from your folder.
 """
-function delete_Figure_1_estimates(;pwd::String=pwd())
+function delete_Figure_1_estimates(;pwd::AbstractString=pwd())
     path = "0_input/ster/estimates.csv"
     path = string(pwd,"/",path)
     if isfile(path)
@@ -54,7 +54,7 @@ end
 The function `load_covar_pop_count` ensures that the file "covar_pop_count.dta" is in your input folder. 
 It is necessary for the replication of the Figure 1 of the article.
 """
-function load_covar_pop_count(;pwd::String=pwd())
+function load_covar_pop_count(;pwd::AbstractString=pwd())
     path = "0_input/cleaned_data/covar_pop_count.dta"
     path = string(pwd,"/",path)
     if isfile(path)
@@ -79,7 +79,7 @@ end
 """
 The function `delete_covar_pop_count` deletes the file "covar_pop_count.dta" from your folder.
 """
-function delete_covar_pop_count(;pwd::String=pwd())
+function delete_covar_pop_count(;pwd::AbstractString=pwd())
     path = "0_input/cleaned_data/covar_pop_count.dta"
     path = string(pwd,"/",path)
     if isfile(path)
@@ -99,7 +99,7 @@ end
 The function `load_coefficients` ensures that the file "coefficients.csv" is in your input folder. 
 It is necessary for the replication of the Figure 1 of the article.
 """
-function load_coefficients(;pwd::String=pwd())
+function load_coefficients(;pwd::AbstractString=pwd())
     path = "0_input/ster/coefficients.csv"
     path = string(pwd,"/",path)
     if isfile(path)
@@ -124,7 +124,7 @@ end
 """
 The function `delete_coefficients` deletes the file "coefficients.csv" from your folder.
 """
-function delete_coefficients(;pwd::String=pwd())
+function delete_coefficients(;pwd::AbstractString=pwd())
     path = "0_input/ster/coefficients.csv"
     path = string(pwd,"/",path)
     if isfile(path)

@@ -25,7 +25,7 @@ function load_global_mortality_panel_covariates(;pwd::String=pwd())
         tmp = String(res.body)
         write(path, tmp)
         sleep(1) # Waiting to avoid HTTP requests problem.
-        @info string("File ", path, " successfully downloaded.")
+        # @info string("File ", path, " successfully downloaded.")
         
         # Setting values to nothing and collecting garbage to reduce memory usage.
         url = res = tmp = nothing
