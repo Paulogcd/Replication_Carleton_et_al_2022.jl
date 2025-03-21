@@ -55,6 +55,7 @@ function create_figure_1()
     ### use "$data_dir/3_final/global_mortality_panel_covariates.dta", clear
 
     # Ensuring that the data is loaded:
+    create_folder_setup()
     load_global_mortality_panel_covariates()
     # !!! Caution : this file weights 2.6 Gb !!!
     df = DataFrame(ReadStatTables.readstat("0_input/final_data/global_mortality_panel_covariates.dta"))
@@ -252,6 +253,7 @@ function create_figure_1()
 
 
     # Ensures that the data is available:
+    create_folder_setup()
     load_covar_pop_count()
     # Read it: 
     covar_pop_count = DataFrame(ReadStatTables.readstat("0_input/cleaned_data/covar_pop_count.dta"))
@@ -691,14 +693,15 @@ function create_figure_1()
 
                 # Ensuring data is available: 
                 if T == y == age == 1
+                    create_folder_setup()
                     load_coefficients()
                 end
                 # loading the data:
                 data = CSV.read("0_input/ster/coefficients.csv", DataFrame)
-                # We can delete the two first lines: 
+                # We can delete the THREE first lines: 
                 data = data[Not(1),:]
                 data = data[Not(1),:]
-                # data = data[Not(1),:]
+                data = data[Not(1),:]
                 # coefficients, standard errors, t-statistics, p-value.
                 tmp = Array{String}(undef,38)
                 for (index_row,row) in enumerate(1:4:size(data)[1])
