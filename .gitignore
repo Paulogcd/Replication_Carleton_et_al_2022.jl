@@ -5,5 +5,7 @@ docs/build/
 0_input/final_data/global_mortality_panel_public.dta
 0_input/cleaned_data/covar_pop_count.dta
 0_input/main_specifications/mortality-allpreds_filtered.csv
+0_input/
+0_output/
 utilities/ftp_connect
 src/.DS_Store

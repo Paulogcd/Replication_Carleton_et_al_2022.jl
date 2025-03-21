@@ -24,7 +24,7 @@ using Plots
 ### PART A. Initializing
 ### PART B. Toggles 
 
-function create_figure_1()
+function create_figure_1(;pwd::AbstractString=pwd())
 
     matsize = 10_000
     maxvar = 32_700
@@ -1001,10 +1001,16 @@ function create_figure_1()
     # vector_of_plots[1,1]
 
     @info string("Creating Figure 1 subfigures...")
-    savefig(vector_of_plots[1,1], "0_output/Figure_1_1.png")
-    savefig(vector_of_plots[2,1], "0_output/Figure_1_2.png")
-    savefig(vector_of_plots[3,1], "0_output/Figure_1_3.png")
-    @info string("Subfigures of figure 1 successfully created!")
+    path_1 = joinpath(pwd,"0_output/Figure_1_1.png")
+    path_2 = joinpath(pwd,"0_output/Figure_1_2.png")
+    path_3 = joinpath(pwd,"0_output/Figure_1_3.png")
+    savefig(vector_of_plots[1,1], path_1)
+    savefig(vector_of_plots[2,1], path_2)
+    savefig(vector_of_plots[3,1], path_3)
+    @info string("Subfigures of figure 1 successfully created: ")
+    @info path_1
+    @info path_2
+    @info path_3
 
 end
 
