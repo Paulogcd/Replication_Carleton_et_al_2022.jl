@@ -68,8 +68,10 @@ Due to the large size of the package files, we also included a function to manag
 If you wish to keep your directory, but without the `0_input` and `0_output` folders, you can delete them via the following function:
 
 ```
-Replication_Carleton_et_al_2022.delete_folder_structure()
+Replication_Carleton_et_al_2022.delete_folder_setup()
 ```
+
+Be careful. This is irreversible.
 
 ## Undocumented list of functions of the package
 

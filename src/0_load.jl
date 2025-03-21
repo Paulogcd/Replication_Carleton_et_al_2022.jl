@@ -11,6 +11,10 @@ include("0_input_data_1.jl")
 include("0_input_data_2.jl")
 # include("0_input_data_1.jl") # Already included.
 
+# Figure 2: 
+include("0_input_data_3.jl")
+# include("0_input_data_1.jl") # Already included.
+
 """
 The function "create_folder_setup" creates the folders "0_input" (and its subfolders) and "0_output", that are necessary for the 
     other functions to run.
@@ -25,6 +29,7 @@ function create_folder_setup(;pwd::AbstractString=pwd())
             mkpath(joinpath(pwd,"0_input/cleaned_data"))
             mkpath(joinpath(pwd,"0_input/final_data"))
             mkpath(joinpath(pwd,"0_input/ster"))
+            mkpath(joinpath(pwd,"0_input/main_specifications"))
             mkpath(joinpath(pwd,"0_output/"))
             @info string("Folder structure successfully created.")
     else 
@@ -34,10 +39,12 @@ end
 
 # create_folder_setup()
 
-function delete_folder_setup(;pwd::String=pwd())
-    if ispath(joinpath(pwd,"0_input/cleaned_data")) || 
-        ispath(joinpath(pwd,"0_input/final_data")) ||
-        ispath(joinpath(pwd,"0_input/ster")) ||
+function delete_folder_setup(;pwd::AbstractString=pwd())
+    if ispath(joinpath(pwd,"0_input/")) || 
+        # ispath(joinpath(pwd,"0_input/cleaned_data")) || 
+        # ispath(joinpath(pwd,"0_input/final_data")) ||
+        # ispath(joinpath(pwd,"0_input/ster")) ||
+        # ispath(joinpath(pwd,"0_input/main_specifications")) ||
         ispath(joinpath(pwd,"0_output"))
 
             @info string("Deleting folders...")
@@ -61,10 +68,10 @@ It should be run before the `run` function of the package.
 function load(;pwd::String=pwd())
 
     create_folder_setup(pwd=pwd)
-    total = 5
+    total = 6
     i = 1
 
-    @info string("Beginning of the data and files loading.")
+    @info string("Beginning of the data and files loading...")
     
     @info string("Ensuring file 'global_mortality_panel_covariates.dta': ", i,"/", total)
     load_global_mortality_panel_covariates(pwd=pwd) 
@@ -84,6 +91,10 @@ function load(;pwd::String=pwd())
 
     @info string("Ensuring file 'coefficients.csv': ", i,"/", total)
     load_coefficients(pwd=pwd)
+    i += 1
+
+    @info string("Ensuring file 'mortality-allpreds_filtered.csv': ", i,"/", total)
+    load_mortality_allpreds_filtered(pwd=pwd)
     i += 1
 
     println()

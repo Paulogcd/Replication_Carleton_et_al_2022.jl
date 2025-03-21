@@ -31,10 +31,8 @@ did compare with our final replication results.
 ### Technical documentation
 
 You will find the list of functions of this package in the list page, [available here](./list.md).
-You 
+This section goes through the installation of the package, how to run the results, and how to delete the files.
 
 ### Tests of the package
 
-You will find the set of tests of this package at [this page](./tests.md).
-
-
+You will find the discussion of the set of tests of this package at [this page](./tests.md).

@@ -1,6 +1,6 @@
 @testset "Figure 1" begin
 
-    # For the create_table_2() function to work, as all other functions included in the 'run' function, 
+    # For the create_figure_1() function to work, as all other functions included in the 'run' function, 
     # it first requires that the right folder structure exists:
     Replication_Carleton_et_al_2022.create_folder_setup()
 

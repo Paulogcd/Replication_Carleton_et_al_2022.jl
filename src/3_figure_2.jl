@@ -32,7 +32,7 @@ function plot_heatmap(data, year)
         colorbar=true,
         c=blue_gradient)
 end
-# 
+
 
 """
 The function "create_figure_2()" generates our attempt of replication of the figure 2 in the "output()" folder. 
@@ -48,7 +48,7 @@ function create_figure_2(;pwd::AbstractString=pwd())
 
     file = "0_input/main_specifications/mortality-allpreds_filtered.csv"
     # !!! Warning !!! : This file weights 3 Gb.
-    df = CSV.read(joinpath(pwd,file), DataFrame)
+    df = CSV.read(joinpath(pwd,file), DataFrame, header=true)
     # However, the df file that is produced only takes 1.6 Gb...
     # summary(df)
 

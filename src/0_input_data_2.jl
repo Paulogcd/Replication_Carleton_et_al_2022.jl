@@ -10,13 +10,13 @@ The function `loading_Figure_1_estimates` ensures that the file "estimates.csv" 
 It is necessary for the replication of the Figure 1 of the article.
 """
 function load_Figure_1_estimates(;pwd::AbstractString=pwd())
-    path = "0_input/ster/estimates.csv"
-    path = string(pwd,"/",path)
+    localpath = "0_input/ster/estimates.csv"
+    path = joinpath(pwd,localpath)
     if isfile(path)
         @info string("File ", path ," is already in your system.")
     elseif !isfile(path) # Check and only activates if you do not have the file in your computer:
         @info string("File ", path, " not found. Proceeding to download.")
-        url = "https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/0_input/ster/estimates.csv"
+        url = string("https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/", localpath)
         @info string("Dowloading from ", url)
         res = HTTP.get(url)
         body = res.body

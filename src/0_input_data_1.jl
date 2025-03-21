@@ -6,7 +6,6 @@
 using HTTP
 
 """
-# This function did not get tested!!!
 The function `load_final_data_covariates` ensures that the file "global_mortality_panel_covariates" is in your input folder.
 Since the data weights 2 Gigabytes, be sure to have a good internet connection.
 """

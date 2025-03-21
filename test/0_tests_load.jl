@@ -20,10 +20,10 @@
     pre_path = pwd() # This is for better modulability in the tests, to be able to redirect to other directories if needed.
 
     Replication_Carleton_et_al_2022.create_folder_setup(pwd=pre_path)
-    # Test of 0_input_data_1.jl
+    
+    ## Test of 0_input_data_1.jl
 
     # Test the load of the global mortality panel covariates:
-    
     Replication_Carleton_et_al_2022.load_global_mortality_panel_covariates(pwd=pre_path)
     path = joinpath(pre_path,"0_input/final_data/global_mortality_panel_covariates.dta")
     @test isfile(path)
@@ -41,7 +41,9 @@
     Replication_Carleton_et_al_2022.delete_global_mortality_panel_public(pwd=pre_path)
     @test !isfile(path)
 
-    # Test of 0_input_data_2.jl
+    ## Test of 0_input_data_2.jl
+
+    # Test the load of figure 1 estimates:
     Replication_Carleton_et_al_2022.load_Figure_1_estimates(pwd=pre_path)
     path = joinpath(pre_path,"0_input/ster/estimates.csv")
     @test isfile(path)
@@ -59,7 +61,13 @@
     Replication_Carleton_et_al_2022.delete_covar_pop_count(pwd=pre_path)#pwd=pre_path)pwd=pre_path)
     @test !isfile(path)
 
-    # Test of the load() function, that loads all the required files altogether:
+    ## Test of 0_input_data_3.jl
+    Replication_Carleton_et_al_2022.load_mortality_allpreds_filtered(pwd=pre_path)
+    path = joinpath(pre_path,"0_input/main_specifications/mortality-allpreds_filtered.csv")
+    @test isfile(path)
+
+
+    ### Test of the load() function, that loads all the required files altogether:
     Replication_Carleton_et_al_2022.load(pwd=pre_path)#pwd=pre_path)
     path = joinpath(pre_path,"0_input/final_data/global_mortality_panel_covariates.dta")
     @test isfile(path)
