@@ -12,7 +12,7 @@
     # generates 3 png files in the 0_output folder.
     Replication_Carleton_et_al_2022.create_figure_2()
     # Finally, we check for their existence:
-    @test isfile(joinpath(pwd(),"0_output/figure_2_2015.png"))
-    @test isfile(joinpath(pwd(),"0_output/figure_2_2015.png"))
+    @test isfile(joinpath(pwd(),"0_output/Figure_2_2015.png"))
+    @test isfile(joinpath(pwd(),"0_output/Figure_2_2100.png"))
 
 end

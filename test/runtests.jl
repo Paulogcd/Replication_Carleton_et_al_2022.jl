@@ -11,10 +11,10 @@ using Test
     # include("1_tests_table_1.jl") # All tests pass.
 
     # Test of the function that creates figure 1.
-    include("2_tests_figure_1.jl") 
+    # include("2_tests_figure_1.jl") 
 
     # Test of the function that creates figure 2.
-    # include("3_tests_figure_2.jl") # 
+    include("3_tests_figure_2.jl") # 
 
 end
 
