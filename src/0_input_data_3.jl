@@ -11,7 +11,7 @@ function load_mortality_allpreds_filtered(;pwd::AbstractString=pwd())
         @info string("File ", path, " not found. Proceeding to download.")
         url = string("https://www.paulogcd.fr/replications/replication_carleton_et_al_2022/resources/", localpath) 
         @info string("Dowloading from: ", url)
-        @warn string("The file weights 2 Gigabytes, and its downloading can take some time.")
+        @warn string("The file weights 3 Gigabytes, and its downloading can take some time.")
         res = HTTP.get(url)
         body = res.body
         CSV.write(path, CSV.read(body,  DataFrame), header=true)
