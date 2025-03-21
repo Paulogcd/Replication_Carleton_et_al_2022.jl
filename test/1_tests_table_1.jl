@@ -11,7 +11,7 @@
     # The create_table_1() function generates the pdf of the table 1 in the 0_output folder.
     Replication_Carleton_et_al_2022.create_table_1()
     # We test the existence of this file:
-    @test isfile("0_output/table_1.pdf")
+    @test isfile("0_output/table_1.html")
     
 end
 # print("Tests of table 1 done.")

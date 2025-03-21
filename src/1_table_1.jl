@@ -613,9 +613,12 @@ function old_create_table_1()
 end
 
 """
-creates a `pdf` containing the replication result of the Figure 1.
+creates a `html` file containing the replication result of the Figure 1.
 
-The `pdf` file is created within the `0_output` folder.
+The `html` file is created within the `0_output` folder.
+
+If you want to generate the Table 1 in a `pdf` file, you should use the old_create_table_1() function. 
+You should however ensure that you have latex installed to do so.
 """
 function create_table_1(;pwd::AbstractString=pwd())
     # cd(dirname(pathof(Replication_Monge_et_al_2019)))
@@ -624,6 +627,7 @@ function create_table_1(;pwd::AbstractString=pwd())
     ---
     title: "Table 1"
     author: CHAMBON L., GUGELMO CAVALHEIRO DIAS P.
+    output: html_document
     ---
     
     This file presents the table 1 obtained from our replication attempt.
@@ -645,28 +649,31 @@ function create_table_1(;pwd::AbstractString=pwd())
     ```
 
     ```{julia; echo = false}
-    df[!,1:3]
+    # df[!,1:3]
     ```
 
     ```{julia; echo = false}
-    df[!,4:6]
+    # df[!,4:6]
     ```
 
     ```{julia; echo = false}
-    df[!,7:end]
+    # df[!,7:end]
+    ```
+
+    ```{julia; echo = false}
+    df
     ```
 
     """)
 
-    weave("table_1.jmd"; doctype = "md2pdf")
+    weave("table_1.jmd"; doctype = "md2html")
 
-    # rm("header.tex")
-    rm("table_1.aux")
+    # rm("table_1.aux")
     rm("table_1.jmd")
-    rm("table_1.log")
-    rm("table_1.out")
-    rm("table_1.tex")
-    mv("table_1.pdf", "0_output/table_1.pdf")
+    # rm("table_1.log")
+    # rm("table_1.out")
+    # rm("table_1.tex")
+    mv("table_1.html", "0_output/table_1.html"; force=true)
 end
 
 # create_table_1()
@@ -680,11 +687,12 @@ end
 # data_table_1 = latexify(results_table_1; env=:table, booktabs=true, latex=false)
 
 
-"""
-The functio 'delete_table_1()' deletes the pdf of the table 1 in the output folder.
-"""
-function delete_table_1()
-    rm("0_output/table_1.pdf")
-end
+# """
+# The functio 'delete_table_1()' deletes the pdf of the table 1 in the output folder.
+# """
+# function delete_table_1()
+#     isfile("0_output/table_1.pdf") ? rm("0_output/table_1.pdf") : return 0
+#     isfile("0_output/table_1.pdf") ? rm("0_output/table_1.html") : return 0
+# end
 
 @info ("Compilation of create_table_1(): Done")
