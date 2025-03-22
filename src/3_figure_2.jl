@@ -47,7 +47,7 @@ function create_figure_2(;pwd::AbstractString=pwd())
     # The "(...)_filtered" file is obtained by doing so.
 
     file = "0_input/main_specifications/mortality-allpreds_filtered.csv"
-    # !!! Warning !!! : This file weights 3 Gb.
+    # !!! Warning !!! : This file weighs 3 GB.
     df = CSV.read(joinpath(pwd,file), DataFrame, header=true)
     # However, the df file that is produced only takes 1.6 Gb...
     # summary(df)
