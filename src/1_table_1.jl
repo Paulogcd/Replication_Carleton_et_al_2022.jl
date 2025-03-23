@@ -20,6 +20,8 @@ using Latexify
 using Base.GC
 using Weave
 
+# First, we define some functions that will be useful later:
+
 function calculate_p99(x)
     return quantile(skipmissing(x), 0.99)
 end
@@ -281,12 +283,12 @@ function pre_create_table_1()
     df.pop_adm0_2010 = zeros(size(df)[1]) # Initialising a zero vector 
     df.pop_adm0_2010[df.iso .== "BRA",:] .= 196796
     df.pop_adm0_2010[df.iso .== "CHL",:] .= 16993
-    df.pop_adm0_2010[df.iso .== "CHN",:] .= 1337705
+    # df.pop_adm0_2010[df.iso .== "CHN",:] .= 1337705
     df.pop_adm0_2010[df.iso .== "FRA",:] .= 65028
     df.pop_adm0_2010[df.iso .== "IND",:] .= 1230981
     df.pop_adm0_2010[df.iso .== "JPN",:] .= 128070
     df.pop_adm0_2010[df.iso .== "MEX",:] .= 117319
-    df.pop_adm0_2010[df.iso .== "USA",:] .= 309348
+    # df.pop_adm0_2010[df.iso .== "USA",:] .= 309348
     df.pop_adm0_2010 .= df.pop_adm0_2010 * 1000
 
     # Also, they create the population share for each country: 
@@ -603,7 +605,8 @@ end
 # export generate_table_1()
 
 """
-The function `old_create_table_1()` is deprecated. Use `create_table_1()` instead.
+The function `old_create_table_1()` can only be run if you have a LaTeX distribution installed on your machine.
+Use `create_table_1()` instead, to produce an HTML version of the replication result of the table 1.
 """
 function old_create_table_1()
     generate_table_1(pre_create_table_1())
