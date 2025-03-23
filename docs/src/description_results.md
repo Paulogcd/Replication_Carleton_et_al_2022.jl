@@ -179,9 +179,24 @@ In this sense, we tried to have readable graphical output, given the time, data,
 
 ### Original exhibit
 
+Figure 2 plots the distribution of regions according to long-run average temperatures and log GDP per capita. It builds on the empirical framework described in the previous section to compute projected mortality rates both within and beyond the original mortality data sample.
+
+The previous section described temperature-mortality relationships for a restricted sample of the global population. To extrapolate further, the authors use these temperature-mortality estimates along with regional income and climate projection data to obtain a comprehensive temperature-income distribution, which is plotted in the original Figure II of the paper.
+
+The gray shaded area described binned temperature-income regions and show that available data covers a wide range of global temperatures. However, the sample lacks data from the lower end of the income distribution, which are likely regions less capable of adapting to the consequences of climate change. Estimating climate-income relationships in those regions is thus crucial.
+
+The authors allow each region's temperature response function to vary over time by including various internationally standardized climate and income evolution scenarios. The original exhibit does so for a median-growth (SSP3) scenario under a high-emissions (RCP8.5) projection. It shows that until 2100, temperatures and incomes are predicted to rise also in regions beyond the estimating sample. The authors draw two important conclusions: 
+
+- The mortality-temperature response function in weakly monotonic around an estimated, location-specific minimum mortality temperature (MMT).
+- Rising incomes cannot increase the temperature sensitivity of mortality. Put simply according to the authors, rising incomes cannot make a region worse off.
+
+With these restrictions in mind, the authors use Monte Carlo simulations and regional estimated temperature sensitivity of mortality to assess annual effects of climate change by age group in each region. The results of these simulations are shown in Figure III of the original paper.
+
 ![Figure 2](./original_figure_2.png)
 
 ### Replication result
+
+We were able to replicate this using the mortality-allpreds.csv file, which we filter in bash to remove metadata that had rendered it unreadable for Julia. It is slightly larger than 3 GB. The results are shown below:
 
 ```@raw html
 <img src="../heatmap_full_2015.png" width="33%"/> <img src="../heatmap_full_2100.png" width="33%"/> 
@@ -190,3 +205,26 @@ In this sense, we tried to have readable graphical output, given the time, data,
 ```@raw html
 <img src="../heatmap_ins_2015.png" width="33%"/> <img src="../heatmap_ins_2100.png" width="33%"/> 
 ``` ⠀
+
+We decided not to overlay the different heatmaps for better readability. Estimating sample refers to countries which report subnational income and mortality data, which the authors use to estimate income-temperature relationships globally, which the authors call _full sample_, as is done in the original paper.
+
+Our attempt captures that incomes and temperatures are predicted to rise beyond the original estimating sample. However, we also believe that our sample and binning technique is not identical to the original figure, as the csv file mentioned in the documentation only contains the full sample and the provided code does not detail how the data were subsampled to obtain the heatmaps. Instead, the R code only explicits a function that calls various objects of the global environment we could not set up, and we are also convinced that some of the data needed for exact replication is stored inaccessibly in .ster format. We believe that these estimates would be needed for us to replicate any further figures, along with the mortality-allpreds.csv file, which was unfortunately technically infeasible. However, we believe our figure captures the main finding of the original exhibit.
+
+## Figure 5: Illustration of replication issues
+
+To illustrate further the difficulties we encountered when performing the data analysis, we decided to include our intermediary attempt of replication of figure 5.
+
+Figure 5 plots projected mortality rates until 2100 under different climate change adaptation and emissions scenarios. According to the authors, all intermediate data necessary to replicate projection figures is available in a subfolder called montecarlo, which contains various .csv files of summary statistics from the original Monte Carlo simulations. Since these files match the description in the replication material and contain the same range of observations across years as Figure 5, we believed these could be used to replicate more figures. However, these files, which are structured according to various projection scenarios, do not include detailed information on how some variables are constructed. Since we cannot run the Monte Carlo simulations themselves, it is not clear for us how these data lead to the respective figures. To illustrate, panel B of the figure below plots a time series of the data in question. The main variable is called mean, but we do not know what this is the mean of. The datapoints are all incredibly close to zero, which is why we scale them for better readability and average them acros all countries for each year. The data plotted, that does not match graphically the figure 5, was chosen due to the matching in terms of years recorded, when compared to other csv files. It is however obvious that further manipulation is needed, or that the actual mortality rates cannot be computed from the data at hand, as this is an unsatisfactory result. We have also tried going through the appropriate sections of code. However, these call objects from the original Monte Carlo runs and not the intermediate data. 
+
+![Original figure 5](./original_figure_5.png)
+
+![Intermediary result of figure 5](./intermediary_failed_result_figure_5.png)
+
+## Concluding remarks
+
+Overall, we are not satisfied with our replicated results and the final result of our work.
+We encountered multiple technical difficulties that prevented us from diving deeper into the actual replication tasks. 
+These, coupled with the intrinsic complexity of the data and method used, made it difficult to follow the structure of the original replication package, which led us to several approximations and created important discrepancies with the original material.
+However, we have gained new interesting insights on working with large data files, ensuring their right loading, dealing with their meta-data, 
+on the converting process of STATA proprietary files to more accessible ones, and on how our machines (and high intensity computing) work. 
+Overall, although a difficult task, we learned a lot.
