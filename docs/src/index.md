@@ -18,10 +18,10 @@ For our replication, we wanted to reproduce figures on the temperature-mortality
 
 The documentation of our replication package is divided in the following subsections: 
 
-1. Presentation of the course of our replication attempt
-2. Comment on our replication results.
-3. Technical documentation
-4. Tests of the package
+```@contents
+Pages = ["index.md"]
+Depth = 3
+```
 
 ### Presentation of the course of our replication attempt
 
@@ -29,7 +29,7 @@ You will find the presentation of our replication attempt at [this page](./descr
 We mainly discuss the challenges we encountered, how we tried to tackle them, and how our expected replication results
 did compare with our final replication results.
 
-### Presentation of 
+### Presentation of the replication results
 
 You will find the presentation of our replication results at [this page](./description_results.md).
 We mainly discuss the results we wanted to replicate, and the results we obtained.

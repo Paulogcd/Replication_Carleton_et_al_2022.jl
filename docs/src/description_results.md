@@ -39,13 +39,6 @@ The Panel B part of the table includes several variables, among which the datase
 We focus here only on the panel A part of the table. Essentially, the authors took different national datasets and provide a brief description for each one of them. 
 The countries presented are Brazil, Chile, China, European Union, France, India, Japan, Mexico, and the United States. One last line correspond to "all countries" and is an aggregate of the listed countries.
 
-The number of observations variable correspond...
-
-The spatial scale variable correspond...
-can take several values...
-
-The years variable correspond to the years of beginning and of end of the observations. They differ in function of the countries...
-
 The age categories variable presents the different age categories listed in each one of the national dataset. The Indian dataset does not have detailed information on age category and includes all ages only.
 The French dataset age categories has a different age categorization than the other national datasets, and divides its age category among: 0-19 years, 20-64 years, and more than 64 years.
 For all of other countries, the age categories are: 
@@ -112,21 +105,88 @@ The replication user can still produce a PDF using the [`Replication_Carleton_et
 
 ### Original exhibit
 
+The figure 1 is derived from the empirical estimation of a regression model that examines the relationship between mortality rates and temperature, accounting for heterogeneity due to income and climate. The specific steps and equations used to obtain this figure are as follows:
+
+1. Data Collection:
+   - Mortality Data: Collected from 40 countries, covering 38% of the global population. The data includes age-specific annual mortality rates for three age categories: <5, 5-64, and >64.
+   - Climate Data: Historical climate data from sources like the Global Meteorological Forcing Dataset (GMFD) and Berkeley Earth Surface Temperature data set (BEST).
+   - Covariate Data: Income per capita and long-run average temperature data at the first administrative level (ADM1).
+
+2. Empirical Model:
+   - The regression model used is:
+     ``M_{ait} = g_a(\boldsymbol{T}_{it}, TMEAN_s, \log(GDPpc)_s) + q_{ca}(\boldsymbol{R}_{it}) + \alpha_{ai} + \delta_{act} + \varepsilon_{ait}``
+   - Variables:
+     - `` M_{ait} ``: Age-specific mortality rate.
+     - `` \boldsymbol{T}_{it} ``: Vector of temperature variables (fourth-order polynomial of daily average temperatures).
+     - `` TMEAN_s ``: Long-run average temperature.
+     - `` \log(GDPpc)_s ``: Log of GDP per capita.
+     - `` \boldsymbol{R}_{it} ``: Vector of precipitation variables.
+     - `` \alpha_{ai} ``: Age × ADM2 fixed effects.
+     - `` \delta_{act} ``: Age × country × year fixed effects.
+
+3. Estimation:
+   - The model is estimated using a pooled sample of age-specific mortality rates across the 40 countries.
+   - The temperature data are aligned with annual administrative mortality records using a method that allows for the recovery of a nonlinear relationship between mortality and temperature.
+
+4. Prediction:
+   - The sample is divided into nine subsamples based on terciles of climate and income.
+   - Predicted response functions are plotted at the mean value of climate and income in the nine subsamples using the coefficients from the regression model.
+
+The figure 1 illustrates the heterogeneity in the mortality-temperature relationship for individuals aged over 64 across different income and climate conditions. Each panel represents a predicted mortality-temperature response function for a subset of the income-average temperature covariate space. The figure shows how mortality rates vary with temperature for different income levels (rows) and average temperatures (columns).
+
+- Interpretation:
+  - The figure reveals that both income and long-run average temperature moderate the sensitivity of mortality to temperature.
+  - Higher incomes and warmer climates are associated with a flatter mortality-temperature response, indicating better adaptation to extreme temperatures.
+
+The underlying assumptions are the following:
+
+- Causal Relationship: The model assumes that the year-to-year variation in temperature within locations is plausibly random, allowing for the identification of the causal effect of temperature on mortality.
+
+- Heterogeneity: The model allows for heterogeneity in the mortality-temperature relationship across different income levels and climates. This heterogeneity is assumed to be associational due to the lack of experimental variation in climate.
+
+- Adaptation: The model assumes that individuals and societies adapt to their climate, and higher incomes facilitate better adaptation. This is reflected in the interaction terms between temperature and income/climate variables.
+
+-  Data Representativeness: The model assumes that the data from the 40 countries are representative of the global mortality-temperature relationship, allowing for extrapolation to regions without data.
+
+#### Comment on the assumptions
+
+The original Figure 1 effectively communicates the key finding that both income and climate significantly influence the mortality-temperature relationship. The use of terciles to divide the sample provides a clear visual representation of how these factors interact. The figure highlights the importance of adaptation and income in mitigating the impacts of extreme temperatures on mortality, particularly for the elderly population. The assumptions underlying the interpretation are reasonable, given the data and methodology used. However, the associational nature of the heterogeneity results should be considered when interpreting the findings.
+
+![Figure 1](original_figure_1.png)
+
 ### Replication result
 
-## Figure 2: Heatmap...
+In our replication attempt of Figure I from the study "Valuing the Global Mortality Consequences of Climate Change Accounting for Adaptation Costs and Benefits," we tried following the outlined methodology in the original replication package.
+
+However, we encountered several technical challenges that prevented us from fully replicating the results. The technical difficulties required too much time to be solved, and we could only replicate a part of their STATA .do file for the figure. 
+Additionally, the authors used a .ster file to store their estimates in this step. 
+This format of file cannot be read by other software directly.
+We had to resort to manually extract the estimates via a matrix, and importing it in csv.
+Even so, not all the mentioned estimates could be exported in this fashion, which led to an incomplete regression formula.
+In this sense, our replication result strongly differs from the original due to the non-inclusion of a part of the regression.
+
+These results should NOT be interpreted, given that the regression formula is not the same, and refers to different estimates.
+
+```@raw html
+<img src="../Figure_1_1.png" width="33%"/> <img src="../Figure_1_2.png" width="33%"/> <img src="../Figure_1_3.png" width="33%"/>
+``` ⠀
+
+Here, we reproduced only 3 of the subfigures, due to the graphical differences between income classes not being noticeable in our output. Also, the additional statistics of the estimates (including the confidence intervals) were not available due to the .ster format problem mentioned, and were therefore not included in the graphical output.
+We also decided to reduce the graphical additions to avoid additional problems due to some of their variable referring to some defined in the .ster file.
+In this sense, we tried to have readable graphical output, given the time, data, and material constraints we were given.
+
+## Figure 2: Heatmap
 
 ### Original exhibit
 
+![Figure 2](./original_figure_2.png)
+
 ### Replication result
 
+```@raw html
+<img src="../heatmap_full_2015.png" width="33%"/> <img src="../heatmap_full_2100.png" width="33%"/> 
+``` ⠀
 
-3/ Please choose five key exhibits that summarize the whole argument of the paper, i.e. from descriptives to reduced form to structural estimates (if applicable).
-
-4/ Replicate them using another statistical software, and note any difference with the orginal (exact replication is not always possible, it is fine).
-
-5/ Write each replicated exhibit together with an explanation for 
-how they are obtained (e.g. estimating equation, optimization method etc.), 
-what the exhibit means, 
-and what the underlying/ identifying assumptions are for the interpretation given by the authors. Everything in a pdf of 10 pages maximum.
-
+```@raw html
+<img src="../heatmap_ins_2015.png" width="33%"/> <img src="../heatmap_ins_2100.png" width="33%"/> 
+``` ⠀

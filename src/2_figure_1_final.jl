@@ -803,7 +803,7 @@ function create_figure_1(;pwd::AbstractString=pwd())
                 ### 	}
 
                 # This is bugging. 
-                # The source of their original variable is still to determine.
+                # The source of their original variable is the .ster file.
                 if false 
                     for vari in ["loggdppc_adm1_avg" ,"lr_tavg_GMFD_adm1_avg"]
                         z = string("zvalue_",vari)
@@ -857,6 +857,7 @@ function create_figure_1(;pwd::AbstractString=pwd())
                 # The above issue has been examined in detail.
                 # To the best of our knowledge, this discrepancy of results is due to differences in the "data" DataFrame,
                 # containing the estimates.
+                # This is the .ster format file problem we have mention in the documentation.
                 # The estimates from the original replication package have been put in a file "0_input/estimates.csv".
 
                 ### *----------------------------------
